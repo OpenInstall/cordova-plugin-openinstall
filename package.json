@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-openinstall",
+  "version": "1.0.0",
+  "cordova": {
+    "id": "cordova-plugin-openinstall",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "wenki",
+  "license": "MIT",
+  "description": ""
+}

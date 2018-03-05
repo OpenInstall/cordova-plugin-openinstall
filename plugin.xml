@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-openinstall" version="1.0.0" 
+    xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <name>openinstall</name>
+
+    <js-module name="openinstall" src="www/cordova-plugin-openinstall.js">
+        <clobbers target="openinstall" />
+    </js-module>
+
+    <!-- add this to your config.xml -->
+    <!-- <preference name="OPENINSTALL_APPKEY" value="your openinstall appkey" /> -->
+    <!-- <preference name="OPENINSTALL_SCHEME" value="your openinstall scheme" /> -->
+    <preference name="OPENINSTALL_APPKEY" />
+    <preference name="OPENINSTALL_SCHEME" />
+
+    <!-- android -->
+    <platform name="android">
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="OpenInstallPlugin">
+                <param name="android-package" value="io.openinstall.cordova.OpenInstallPlugin"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+        </config-file>
+
+        <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
+		<!--
+        <source-file src="src/android/lib/OpenInstall_v2.1.1.jar" target-dir="app/libs" />
+		-->
+		<lib-file src="src/android/lib/OpenInstall_v2.1.1.jar" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <meta-data
+                android:name="com.openinstall.APP_KEY"
+                android:value="$OPENINSTALL_APPKEY"/>
+        </config-file>
+
+    </platform>
+
+</plugin>
