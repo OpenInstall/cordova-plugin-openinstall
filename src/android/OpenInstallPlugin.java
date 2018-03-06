@@ -66,12 +66,12 @@ public class OpenInstallPlugin extends CordovaPlugin {
 
     protected void init() {
         Log.d(TAG, "init");
-        com.fm.openinstall.OpenInstall.init(cordova.getActivity());
+        OpenInstall.init(cordova.getActivity());
     }
 
     protected void getInstall() {
         Log.d(TAG, "getInstall");
-        com.fm.openinstall.OpenInstall.getInstall(new AppInstallListener() {
+        OpenInstall.getInstall(new AppInstallListener() {
             @Override
             public void onInstallFinish(AppData appData, Error error) {
                 if (error == null) {
@@ -103,7 +103,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
         Intent intent = new Intent();
         intent.setData(Uri.parse(uri));
         Log.d(TAG, "getWakeUp # intent : " + intent.getDataString());
-        com.fm.openinstall.OpenInstall.getWakeUp(intent, new AppWakeUpListener() {
+        OpenInstall.getWakeUp(intent, new AppWakeUpListener() {
             @Override
             public void onWakeUpFinish(AppData appData, Error error) {
                 if (error == null) {
@@ -132,12 +132,12 @@ public class OpenInstallPlugin extends CordovaPlugin {
 
     protected void reportRegister() {
         Log.d(TAG, "reportRegister");
-        com.fm.openinstall.OpenInstall.reportRegister();
+        OpenInstall.reportRegister();
     }
 
     protected void setDebug(boolean debug) {
         Log.d(TAG, "setDebug # " + debug);
-        com.fm.openinstall.OpenInstall.setDebug(debug);
+        OpenInstall.setDebug(debug);
     }
 
 }

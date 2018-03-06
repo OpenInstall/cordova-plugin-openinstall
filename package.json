@@ -4,12 +4,14 @@
   "cordova": {
     "id": "cordova-plugin-openinstall",
     "platforms": [
+      "ios",
       "android"
     ]
   },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android"
+    "cordova-android",
+    "cordova-ios"
   ],
   "author": "wenki",
   "license": "MIT",

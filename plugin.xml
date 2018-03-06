@@ -9,15 +9,12 @@
         <clobbers target="openinstall" />
     </js-module>
 
-    <!-- add this to your config.xml -->
-    <!-- <preference name="OPENINSTALL_APPKEY" value="your openinstall appkey" /> -->
-    <!-- <preference name="OPENINSTALL_SCHEME" value="your openinstall scheme" /> -->
-    <preference name="OPENINSTALL_APPKEY" />
-    <preference name="OPENINSTALL_SCHEME" />
+    <preference name="OPENINSTALL_APPKEY"/>
+    <preference name="OPENINSTALL_SCHEME"/>
 
     <!-- android -->
     <platform name="android">
-
+	
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="OpenInstallPlugin">
                 <param name="android-package" value="io.openinstall.cordova.OpenInstallPlugin"/>
@@ -29,19 +26,35 @@
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
         </config-file>
-
-        <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
-		<!--
-        <source-file src="src/android/lib/OpenInstall_v2.1.1.jar" target-dir="app/libs" />
-		-->
-		<lib-file src="src/android/lib/OpenInstall_v2.1.1.jar" />
-
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+		
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data
-                android:name="com.openinstall.APP_KEY"
+                android:name="com.openinstall.app_key"
                 android:value="$OPENINSTALL_APPKEY"/>
         </config-file>
 
-    </platform>
+        <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
+        <lib-file src="src/android/lib/OpenInstall_v2.1.1.jar" target-dir="libs" />
 
+    </platform>
+    
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="OpenInstallPlugin">
+                <param name="ios-package" value="io.openinstall.cordova.OpenInstallPlugin"/>
+                <param name="onload" value="true" />
+            </feature>
+            <preference name="com.openinstall.app_key" value="$OPENINSTALL_APPKEY"/>
+        </config-file>
+        
+        <!-- Plugin source code -->
+        <header-file src="src/ios/CDVOpenInstall.h" />
+        <source-file src="src/ios/CDVOpenInstall.m" />
+        
+        <header-file src="src/ios/libs/OpenInstallSDK.h" />
+        <source-file src="src/ios/libs/libOpenInstallSDK.a" framework="true" />
+<!--        <source-file src="src/ios/libOpenInstall.a" compiler-flags="-fno-objc-arc" />-->
+
+    </platform>
 </plugin>
