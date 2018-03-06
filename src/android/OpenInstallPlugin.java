@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.fm.openinstall.OpenInstall;
@@ -26,7 +27,9 @@ import org.json.JSONObject;
 
 public class OpenInstallPlugin extends CordovaPlugin {
 
-    public static final String TAG = "OpenInstallPlugin" ;
+    public static final String TAG = "OpenInstallPlugin";
+
+    private CallbackContext callbackContext;
 
     @Override
     protected void pluginInitialize() {
@@ -37,47 +40,43 @@ public class OpenInstallPlugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, "execute # action=" + action);
-        switch (action){
-//            case "init":
-//                init();
-//                break;
-            case "getInstall":
-                getInstall(callbackContext);
-                break;
-            case "getWakeUp":
-                String uri = "";
-                if(args != null && !args.isNull(0)){
-                    uri = args.optString(0);
-                }
-                getWakeUp(uri, callbackContext);
-                break;
-            case "reportRegister":
-                reportRegister();
-                break;
-            case "setDebug":
-                boolean debug = false;
-                if(args != null && !args.isNull(0)){
-                    debug = args.optBoolean(0);
-                }
-                setDebug(debug);
-                break;
+        this.callbackContext = callbackContext;
+        if (TextUtils.isEmpty(action)) {
+            return false;
+        }
+        if ("getInstall".equals(action)) {
+            getInstall();
+        } else if ("getWakeUp".equals(action)) {
+            String uri = "";
+            if (args != null && !args.isNull(0)) {
+                uri = args.optString(0);
+            }
+            getWakeUp(uri);
+        } else if ("reportRegister".equals(action)) {
+            reportRegister();
+        } else if ("setDebug".equals(action)) {
+            boolean debug = false;
+            if (args != null && !args.isNull(0)) {
+                debug = args.optBoolean(0);
+            }
+            setDebug(debug);
         }
         return false;
     }
 
-    private void init(){
+    protected void init() {
         Log.d(TAG, "init");
         com.fm.openinstall.OpenInstall.init(cordova.getActivity());
     }
 
-    private void getInstall(CallbackContext callbackContext){
+    protected void getInstall() {
         Log.d(TAG, "getInstall");
         com.fm.openinstall.OpenInstall.getInstall(new AppInstallListener() {
             @Override
             public void onInstallFinish(AppData appData, Error error) {
-                if(error == null){
-                    Log.d(TAG, "onInstallFinish # " + (appData==null?"AppData is null":appData.toString()));
-                    if(appData != null){
+                if (error == null) {
+                    Log.d(TAG, "onInstallFinish # " + (appData == null ? "AppData is null" : appData.toString()));
+                    if (appData != null) {
                         String channel = appData.getChannel();
                         String data = appData.getData();
                         JSONObject jsonObject = new JSONObject();
@@ -88,10 +87,10 @@ public class OpenInstallPlugin extends CordovaPlugin {
                             e.printStackTrace();
                         }
                         callbackContext.success(jsonObject);
-                    }else {
+                    } else {
                         callbackContext.success();
                     }
-                }else{
+                } else {
                     Log.d(TAG, "onInstallFinish # " + error.toString());
                     callbackContext.error(error.toString());
                 }
@@ -99,7 +98,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
         });
     }
 
-    private void getWakeUp(String uri, CallbackContext callbackContext){
+    protected void getWakeUp(String uri) {
         Log.d(TAG, "getWakeUp # " + uri);
         Intent intent = new Intent();
         intent.setData(Uri.parse(uri));
@@ -107,9 +106,9 @@ public class OpenInstallPlugin extends CordovaPlugin {
         com.fm.openinstall.OpenInstall.getWakeUp(intent, new AppWakeUpListener() {
             @Override
             public void onWakeUpFinish(AppData appData, Error error) {
-                if(error == null){
-                    Log.d(TAG, "onWakeUpFinish # " + (appData==null?"AppData is null":appData.toString()));
-                    if(appData != null){
+                if (error == null) {
+                    Log.d(TAG, "onWakeUpFinish # " + (appData == null ? "AppData is null" : appData.toString()));
+                    if (appData != null) {
                         String channel = appData.getChannel();
                         String data = appData.getData();
                         JSONObject jsonObject = new JSONObject();
@@ -120,10 +119,10 @@ public class OpenInstallPlugin extends CordovaPlugin {
                             e.printStackTrace();
                         }
                         callbackContext.success(jsonObject);
-                    }else {
+                    } else {
                         callbackContext.success();
                     }
-                }else{
+                } else {
                     Log.d(TAG, "onWakeUpFinish # " + error.toString());
                     callbackContext.error(error.toString());
                 }
@@ -131,12 +130,12 @@ public class OpenInstallPlugin extends CordovaPlugin {
         });
     }
 
-    private void reportRegister(){
+    protected void reportRegister() {
         Log.d(TAG, "reportRegister");
         com.fm.openinstall.OpenInstall.reportRegister();
     }
 
-    private void setDebug(boolean debug){
+    protected void setDebug(boolean debug) {
         Log.d(TAG, "setDebug # " + debug);
         com.fm.openinstall.OpenInstall.setDebug(debug);
     }
