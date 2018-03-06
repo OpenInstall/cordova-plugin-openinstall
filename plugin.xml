@@ -29,7 +29,7 @@
 		
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data
-                android:name="com.openinstall.app_key"
+                android:name="com.openinstall.APP_KEY"
                 android:value="$OPENINSTALL_APPKEY"/>
         </config-file>
 
