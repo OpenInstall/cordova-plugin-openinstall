@@ -46,20 +46,24 @@ public class OpenInstallPlugin extends CordovaPlugin {
         }
         if ("getInstall".equals(action)) {
             getInstall();
+			return true;
         } else if ("getWakeUp".equals(action)) {
             String uri = "";
             if (args != null && !args.isNull(0)) {
                 uri = args.optString(0);
             }
             getWakeUp(uri);
+			return true;
         } else if ("reportRegister".equals(action)) {
             reportRegister();
+			return true;
         } else if ("setDebug".equals(action)) {
             boolean debug = false;
             if (args != null && !args.isNull(0)) {
                 debug = args.optBoolean(0);
             }
             setDebug(debug);
+			return true;
         }
         return false;
     }
