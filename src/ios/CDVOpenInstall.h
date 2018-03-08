@@ -6,8 +6,7 @@
 //  Copyright © 2018年 com.cooper.fenmiao. All rights reserved.
 //
 
-#import "CDVPlugin.h"
-#import "CDV.h"
+#import <Cordova/CDVPlugin.h>
 #import "OpenInstallSDK.h"
 
 @interface CDVOpenInstall : CDVPlugin<OpenInstallDelegate,UIApplicationDelegate>

@@ -7,6 +7,7 @@
 //
 
 #import "CDVOpenInstall.h"
+#import <Cordova/CDVPlugin.h>
 
 #define PARAMS @"getInstallParamsFromOpenInstall_params"
 

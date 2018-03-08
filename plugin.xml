@@ -40,9 +40,9 @@
     
     <!-- ios -->
     <platform name="ios">
-        <config-file target="res/xml/config.xml" parent="/*">
+        <config-file target="config.xml" parent="/*">
             <feature name="OpenInstallPlugin">
-                <param name="ios-package" value="io.openinstall.cordova.OpenInstallPlugin"/>
+                <param name="ios-package" value="CDVOpenInstall"/>
                 <param name="onload" value="true" />
             </feature>
             <preference name="com.openinstall.app_key" value="$OPENINSTALL_APPKEY"/>
