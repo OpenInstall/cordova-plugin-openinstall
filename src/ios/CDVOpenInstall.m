@@ -31,7 +31,7 @@
 -(void)getInstall:(CDVInvokedUrlCommand *)command{
     
     self.currentCallbackId = command.callbackId;
-    [self isTimeout:8 WithCompletion:^(BOOL isTimeout) {
+    [self isTimeout:10 WithCompletion:^(BOOL isTimeout) {
         
         if (isTimeout) {
             
@@ -84,7 +84,7 @@
         dispatch_source_set_event_handler(timer, ^{
             
             if (times > 0) {
-                timeout = timeout - 500 * NSEC_PER_MSEC;
+                timeout = timeout * NSEC_PER_SEC - 500 * NSEC_PER_MSEC;
             }
             
             if (timeout <= 0) {
