@@ -9,11 +9,12 @@
     ]
   },
   "keywords": [
-    "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios"
+    "cordova",
+    "ionic",
+    "openinstall",
+	"Channel Statistics"
   ],
-  "author": "wenki",
+  "author": "openinstall",
   "license": "MIT",
-  "description": ""
+  "description": "openinstall的cordova插件"
 }

@@ -1,15 +1,14 @@
 # cordova-plugin-openinstall
-openinstalll的cordova插件
+openinstall 的 cordova 插件
 
 ## 安装插件
 
-下载zip文件或者克隆仓库到本地
 ```
-$ cordova plugin add D:/cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
+$ cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
 
 ```
 
-## 调用
+## 调用API
 
 ### 获取安装参数
 ``` js

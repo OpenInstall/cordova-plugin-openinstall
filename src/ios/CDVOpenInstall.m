@@ -7,7 +7,6 @@
 //
 
 #import "CDVOpenInstall.h"
-#import <Cordova/CDVPlugin.h>
 
 #define PARAMS @"getInstallParamsFromOpenInstall_params"
 
@@ -36,14 +35,21 @@
         
         if (isTimeout) {
             
-            [self failWithCallbackID:command.callbackId withMessage:@"getInstall timeout"];
+            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"channel": @"", @"data": @""}];
+            [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 
         }else{
             
-            NSDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
-            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDic];
+            NSMutableDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
+            NSString *channelID = @"";
+            if ([installDic.allKeys containsObject:@"openinstallChannelCode"]){
+                channelID = installDic[@"openinstallChannelCode"];
+                [installDic removeObjectForKey:@"openinstallChannelCode"];
+            }
+            NSDictionary *installDicResult = @{@"channel":channelID,@"data":installDic?installDic:@""};
+            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
             [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
-            
+
         }
         
         self.currentCallbackId = nil;
