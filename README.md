@@ -18,6 +18,14 @@ window.openinstall.getInstall(function(data){
     console.log('openinstall.getInstall error: ' + msg);
 });
 ```
+也可传入一个整形数值，单位秒，指定时间未返回将超时
+``` js
+window.openinstall.getInstall(function(data){
+    console.log('openinstall.getInstall success: ' + data);
+}, function(msg){
+    console.log('openinstall.getInstall error: ' + msg);
+}, 10);
+```
 成功回调的data数据格式
 ``` json
 {"channel": "渠道号", "data": "自定义数据"}

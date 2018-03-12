@@ -23,7 +23,11 @@
     NSString* appKey = [[self.commandDelegate settings] objectForKey:@"com.openinstall.app_key"];
     if (appKey){
         self.appkey = appKey;
-        [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            
+            [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
+            
+        });
     }
     
 }
@@ -31,7 +35,16 @@
 -(void)getInstall:(CDVInvokedUrlCommand *)command{
     
     self.currentCallbackId = command.callbackId;
-    [self isTimeout:10 WithCompletion:^(BOOL isTimeout) {
+    float outtime = 10.0f;
+    if (command.arguments.count != 0) {
+        id time = [command.arguments objectAtIndex:0];
+        if ([time isKindOfClass:[NSString class]]) {
+            if ([self isPureInt:time]||[self isPureFloat:time]) {
+                outtime = [time floatValue];
+            }
+        }
+    }
+    [self isTimeout:outtime WithCompletion:^(BOOL isTimeout) {
         
         if (isTimeout) {
             
@@ -42,11 +55,19 @@
             
             NSMutableDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
             NSString *channelID = @"";
+            BOOL hasData = NO;
             if ([installDic.allKeys containsObject:@"openinstallChannelCode"]){
                 channelID = installDic[@"openinstallChannelCode"];
-                [installDic removeObjectForKey:@"openinstallChannelCode"];
+                if (installDic.allKeys.count > 1) {
+                    hasData = YES;
+                    [installDic removeObjectForKey:@"openinstallChannelCode"];
+                }
+            }else{
+                if (installDic&&installDic.count != 0) {
+                    hasData = YES;
+                }
             }
-            NSDictionary *installDicResult = @{@"channel":channelID,@"data":installDic?installDic:@""};
+            NSDictionary *installDicResult = @{@"channel":channelID,@"data":hasData?installDic:@""};
             CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
             [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 
@@ -68,9 +89,9 @@
     
 }
 
--(void)isTimeout:(NSTimeInterval)timeoutInterval WithCompletion:(void (^)(BOOL isTimeout))callBack{
+-(void)isTimeout:(float)timeoutInterval WithCompletion:(void (^)(BOOL isTimeout))callBack{
     
-    __block NSTimeInterval timeout = timeoutInterval;//超时时间
+    __block float timeout = timeoutInterval;//超时时间
     
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
                                                      0, 0, dispatch_get_global_queue(0, 0));
@@ -78,13 +99,13 @@
     if (timer)
     {
         [self.timeoutTimersArr addObject:timer];
-        dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), 500 * NSEC_PER_MSEC, 0);
+        dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), 0.4, 0);
         __block int times = 0;
         __block BOOL isTimeout = NO;
         dispatch_source_set_event_handler(timer, ^{
             
             if (times > 0) {
-                timeout = timeout * NSEC_PER_SEC - 500 * NSEC_PER_MSEC;
+                timeout = timeout - 0.4;
             }
             
             if (timeout <= 0) {
@@ -182,15 +203,29 @@
     
 }
 
-- (void)failWithCallbackID:(NSString *)callbackID withError:(NSError *)error
-{
-    [self failWithCallbackID:callbackID withMessage:[error localizedDescription]];
+//判断是否为整形：
+
+- (BOOL)isPureInt:(NSString*)string{
+    
+    NSScanner* scan = [NSScanner scannerWithString:string];
+    
+    int val;
+    
+    return[scan scanInt:&val] && [scan isAtEnd];
+    
 }
 
-- (void)failWithCallbackID:(NSString *)callbackID withMessage:(NSString *)message
-{
-    CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message];
-    [self.commandDelegate sendPluginResult:commandResult callbackId:callbackID];
+//判断是否为浮点形：
+
+- (BOOL)isPureFloat:(NSString*)string{
+    
+    NSScanner* scan = [NSScanner scannerWithString:string];
+    
+    float val;
+    
+    return[scan scanFloat:&val] && [scan isAtEnd];
+    
 }
+
 
 @end
