@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-openinstall" version="1.0.3" 
+<plugin id="cordova-plugin-openinstall" version="1.0.4" 
     xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android">
     
     <name>openinstall</name>
-
-    <js-module name="openinstall" src="www/cordova-plugin-openinstall.js">
-        <clobbers target="openinstall" />
-    </js-module>
 
     <preference name="OPENINSTALL_APPKEY"/>
     <preference name="OPENINSTALL_SCHEME"/>
 
     <!-- android -->
     <platform name="android">
+	
+		<js-module name="openinstall" src="www/android/cordova-plugin-openinstall.js">
+            <clobbers target="openinstall" />
+        </js-module>
 	
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="OpenInstallPlugin">
@@ -33,6 +33,19 @@
                 android:value="$OPENINSTALL_APPKEY"/>
         </config-file>
 
+        <config-file target="AndroidManifest.xml" parent="/manifest/application/activity[@android:name='MainActivity']">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="$OPENINSTALL_SCHEME" />
+            </intent-filter>
+        </config-file>
+
+        <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="merge">
+            <activity android:launchMode="singleTask"/>
+        </edit-config>
+
         <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
         <lib-file src="src/android/lib/OpenInstall_v2.1.1.jar" target-dir="libs" />
 
@@ -40,6 +53,11 @@
     
     <!-- ios -->
     <platform name="ios">
+
+        <js-module name="openinstall" src="www/ios/cordova-plugin-openinstall.js">
+            <clobbers target="openinstall" />
+        </js-module>
+
         <config-file target="config.xml" parent="/*">
             <feature name="OpenInstallPlugin">
                 <param name="ios-package" value="CDVOpenInstall"/>
@@ -54,7 +72,6 @@
         
         <header-file src="src/ios/libs/OpenInstallSDK.h" />
         <source-file src="src/ios/libs/libOpenInstallSDK.a" framework="true" />
-<!--        <source-file src="src/ios/libOpenInstall.a" compiler-flags="-fno-objc-arc" />-->
 
     </platform>
 </plugin>

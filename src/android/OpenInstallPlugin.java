@@ -1,7 +1,6 @@
 package io.openinstall.cordova;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,6 +13,7 @@ import com.fm.openinstall.model.Error;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +21,8 @@ import org.json.JSONObject;
 public class OpenInstallPlugin extends CordovaPlugin {
 
   public static final String TAG = "OpenInstallPlugin";
+
+  private CallbackContext onNewIntentCallbackContext = null;
 
   @Override
   protected void pluginInitialize() {
@@ -38,7 +40,10 @@ public class OpenInstallPlugin extends CordovaPlugin {
       getInstall(args, callbackContext);
       return true;
     } else if ("getWakeUp".equals(action)) {
-      getWakeUp(args, callbackContext);
+      getWakeUp(callbackContext);
+      return true;
+    } else if ("registerWakeUpHandler".equals(action)) {
+      registerWakeUpHandler(callbackContext);
       return true;
     } else if ("reportRegister".equals(action)) {
       reportRegister(args, callbackContext);
@@ -48,6 +53,14 @@ public class OpenInstallPlugin extends CordovaPlugin {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    if (onNewIntentCallbackContext != null) {
+      getWakeUp(intent, onNewIntentCallbackContext);
+    }
   }
 
   protected void init() {
@@ -88,14 +101,15 @@ public class OpenInstallPlugin extends CordovaPlugin {
     }, timeout * 1000);
   }
 
-  protected void getWakeUp(CordovaArgs args, final CallbackContext callbackContext) {
-    String uri = "";
-    if (args != null && !args.isNull(0)) {
-      uri = args.optString(0);
+  protected void getWakeUp(CallbackContext callbackContext) {
+    Intent intent = cordova.getActivity().getIntent();
+    if (intent == null || TextUtils.isEmpty(intent.getDataString())) {
+      return;
     }
-    Log.d(TAG, "getWakeUp # " + uri);
-    Intent intent = new Intent();
-    intent.setData(Uri.parse(uri));
+    getWakeUp(intent, callbackContext);
+  }
+
+  private void getWakeUp(Intent intent, final CallbackContext callbackContext) {
     Log.d(TAG, "getWakeUp # intent : " + intent.getDataString());
     OpenInstall.getWakeUp(intent, new AppWakeUpListener() {
       @Override
@@ -122,6 +136,13 @@ public class OpenInstallPlugin extends CordovaPlugin {
         }
       }
     });
+  }
+
+  protected void registerWakeUpHandler(CallbackContext callbackContext) {
+    this.onNewIntentCallbackContext = callbackContext;
+    PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+    result.setKeepCallback(true);
+    callbackContext.sendPluginResult(result);
   }
 
   protected void reportRegister(CordovaArgs args, final CallbackContext callbackContext) {

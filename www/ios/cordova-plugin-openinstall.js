@@ -12,11 +12,10 @@ module.exports = {
     },
 
     /**
-     * 获取唤醒参数 （暂未实现功能）
-     * @param url 唤起app的完整uri
+     * 获取唤醒参数
      */
-    getWakeUp: function (onSuccess, onError, url){
-        exec(onSuccess, onError, "OpenInstallPlugin", "getWakeUp", [url]);
+    getWakeUp: function (onSuccess, onError){
+        exec(onSuccess, onError, "OpenInstallPlugin", "getWakeUp", []);
     },
 
     /**
