@@ -11,7 +11,7 @@
     <!-- android -->
     <platform name="android">
 	
-		<js-module name="openinstall" src="www/android/cordova-plugin-openinstall.js">
+        <js-module name="openinstall" src="www/cordova-plugin-openinstall.js">
             <clobbers target="openinstall" />
         </js-module>
 	
@@ -27,7 +27,7 @@
             <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
         </config-file>
 		
-		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data
                 android:name="com.openinstall.APP_KEY"
                 android:value="$OPENINSTALL_APPKEY"/>
@@ -54,7 +54,7 @@
     <!-- ios -->
     <platform name="ios">
 
-        <js-module name="openinstall" src="www/ios/cordova-plugin-openinstall.js">
+        <js-module name="openinstall" src="www/cordova-plugin-openinstall.js">
             <clobbers target="openinstall" />
         </js-module>
 

@@ -12,10 +12,19 @@ module.exports = {
     },
 
     /**
-     * 获取唤醒参数
+     * 获取唤醒参数（App未运行被唤醒时）
+     * 仅适用Android平台
      */
     getWakeUp: function (onSuccess, onError){
         exec(onSuccess, onError, "OpenInstallPlugin", "getWakeUp", []);
+    },
+
+    /**
+     * 注册唤醒监听（App后台运行时被拉起）
+     * 仅适用Android平台
+     */
+    registerWakeUpHandler: function(onSuccess, onError){
+        exec(onSuccess, onError, "OpenInstallPlugin", "registerWakeUpHandler", []);
     },
 
     /**

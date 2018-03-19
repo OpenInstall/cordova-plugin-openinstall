@@ -14,6 +14,10 @@
     "openinstall",
 	"Channel Statistics"
   ],
+  "repository" : { 
+    "type" : "git",
+    "url" : "https://github.com/OpenInstall/cordova-plugin-openinstall.git"
+  },
   "author": "openinstall",
   "license": "MIT",
   "description": "openinstall的cordova插件"
