@@ -36,3 +36,9 @@ window.openinstall.getInstall(function(data){
 window.openinstall.reportRegister();
 ```
 
+### 效果点统计
+``` js
+window.openinstall.reportEffectPoint("effect_test", 1);
+```
+第一个参数为“效果点ID”，字符串类型  
+第二个参数为“效果点值”，数字类型
