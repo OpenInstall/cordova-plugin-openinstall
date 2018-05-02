@@ -33,6 +33,16 @@ module.exports = {
     reportRegister: function(){
         function pass() {};
         exec(pass, pass, "OpenInstallPlugin", "reportRegister", []);
+    },
+
+    /**
+     * 上报效果点
+     * @param pointId 效果点ID
+     * @param pointValue 效果点值 (数字类型)
+     */
+    reportEffectPoint: function(pointId, pointValue){
+        function pass() {};
+        exec(pass, pass, "OpenInstallPlugin", "reportEffectPoint", [pointId, pointValue]);
     }
 
 };

@@ -48,6 +48,9 @@ public class OpenInstallPlugin extends CordovaPlugin {
     } else if ("reportRegister".equals(action)) {
       reportRegister(args, callbackContext);
       return true;
+    } else if("reportEffectPoint".equals(action)){
+      reportEffectPoint(args, callbackContext);
+      return true;
     } else if ("setDebug".equals(action)) {
       setDebug(args, callbackContext);
       return true;
@@ -148,6 +151,15 @@ public class OpenInstallPlugin extends CordovaPlugin {
   protected void reportRegister(CordovaArgs args, final CallbackContext callbackContext) {
     Log.d(TAG, "reportRegister");
     OpenInstall.reportRegister();
+  }
+
+  protected void reportEffectPoint(CordovaArgs args, final CallbackContext callbackContext) {
+    if (args != null && !args.isNull(0) && !args.isNull(1)) {
+        String pointId = args.optString(0);
+        long pointValue = args.optLong(1);
+        Log.d(TAG, "reportEffectPoint # pointId:" + pointId + ", pointValue:" + pointValue);
+        OpenInstall.reportEffectPoint(pointId, pointValue);
+    }
   }
 
   protected void setDebug(CordovaArgs args, final CallbackContext callbackContext) {

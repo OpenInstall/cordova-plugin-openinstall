@@ -47,7 +47,7 @@
         </edit-config>
 
         <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
-        <lib-file src="src/android/lib/OpenInstall_v2.1.1.jar" target-dir="libs" />
+        <lib-file src="src/android/lib/OpenInstall_v2.2.0.jar" target-dir="libs" />
 
     </platform>
     
@@ -71,6 +71,7 @@
         <source-file src="src/ios/CDVOpenInstall.m" />
         
         <header-file src="src/ios/libs/OpenInstallSDK.h" />
+		<header-file src="src/ios/libs/OpeninstallData.h" />
         <source-file src="src/ios/libs/libOpenInstallSDK.a" framework="true" />
 
     </platform>

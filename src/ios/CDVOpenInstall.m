@@ -23,11 +23,7 @@
     NSString* appKey = [[self.commandDelegate settings] objectForKey:@"com.openinstall.app_key"];
     if (appKey){
         self.appkey = appKey;
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            
-            [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
-            
-        });
+        [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
     }
     
 }
@@ -35,45 +31,40 @@
 -(void)getInstall:(CDVInvokedUrlCommand *)command{
     
     self.currentCallbackId = command.callbackId;
-    float outtime = 10.0f;
+    float outtime = 5.0f;
     if (command.arguments.count != 0) {
         id time = [command.arguments objectAtIndex:0];
         if ([time isKindOfClass:[NSString class]]) {
-            if ([self isPureInt:time]||[self isPureFloat:time]) {
-                outtime = [time floatValue];
+            NSString *timeResult = (NSString *)time;
+            if ([self isPureInt:timeResult]||[self isPureFloat:timeResult]) {
+                outtime = [timeResult floatValue];
             }
+        }else if ([time isKindOfClass:[NSNumber class]]){
+            NSNumber *timeResult = (NSNumber *)time;
+            outtime = [timeResult floatValue];
         }
     }
-    [self isTimeout:outtime WithCompletion:^(BOOL isTimeout) {
+    [[OpenInstallSDK defaultManager] getInstallParmsWithTimeoutInterval:outtime completed:^(OpeninstallData * _Nullable appData) {
         
-        if (isTimeout) {
-            
+        if (!appData.data&&!appData.channelCode) {
             CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"channel": @"", @"data": @""}];
             [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
-
-        }else{
-            
-            NSMutableDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
-            NSString *channelID = @"";
-            BOOL hasData = NO;
-            if ([installDic.allKeys containsObject:@"openinstallChannelCode"]){
-                channelID = installDic[@"openinstallChannelCode"];
-                if (installDic.allKeys.count > 1) {
-                    hasData = YES;
-                    [installDic removeObjectForKey:@"openinstallChannelCode"];
-                }
-            }else{
-                if (installDic&&installDic.count != 0) {
-                    hasData = YES;
-                }
-            }
-            NSDictionary *installDicResult = @{@"channel":channelID,@"data":hasData?installDic:@""};
-            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
-            [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
-
+            return;
         }
+        NSDictionary *dynamicData;
+        NSString *channelID = @"";
+        if (appData.data) {
+            dynamicData = appData.data;
+        }
+        if (appData.channelCode) {
+            channelID = appData.channelCode;
+        }
+        NSDictionary *installDicResult = @{@"channel":channelID,@"data":dynamicData.count?dynamicData:@""};
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
         
         self.currentCallbackId = nil;
+        
     }];
 
 }
@@ -89,106 +80,39 @@
     
 }
 
--(void)isTimeout:(float)timeoutInterval WithCompletion:(void (^)(BOOL isTimeout))callBack{
+-(void)reportEffectPoint:(CDVInvokedUrlCommand *)command{
     
-    __block float timeout = timeoutInterval;//超时时间
-    
-    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
-                                                     0, 0, dispatch_get_global_queue(0, 0));
-    
-    if (timer)
-    {
-        [self.timeoutTimersArr addObject:timer];
-        dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), 0.4, 0);
-        __block int times = 0;
-        __block BOOL isTimeout = NO;
-        dispatch_source_set_event_handler(timer, ^{
-            
-            if (times > 0) {
-                timeout = timeout - 0.4;
+    NSString *effectPoint = @"";
+    long value = 0;
+    if (command.arguments.count != 0) {
+        id point = [command.arguments objectAtIndex:0];
+        if ([point isKindOfClass:[NSString class]]) {
+            effectPoint = (NSString *)point;
+        }
+        id val = [command.arguments objectAtIndex:1];
+        if ([val isKindOfClass:[NSString class]]) {
+            NSString *valResult = (NSString *)val;
+            if ([self isPureInt:valResult]||[self isPureFloat:valResult]) {
+                value = [valResult longLongValue];
             }
-            
-            if (timeout <= 0) {
-                
-                NSDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
-                if (installDic) {
-                    isTimeout = NO;
-                }else{
-                    isTimeout = YES;
-                }
-                if (callBack) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-            
-                        callBack(isTimeout);
-                        
-                    });
-                }
-                dispatch_source_cancel(timer);
-                [self.timeoutTimersArr removeObject:timer];
-            }else{
-                
-                NSDictionary *installDic = [[NSUserDefaults standardUserDefaults] objectForKey:PARAMS];
-                if (installDic) {
-                    
-                    if (callBack) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            
-                            callBack(NO);
-
-                        });
-
-                    }
-                    dispatch_source_cancel(timer);
-                    [self.timeoutTimersArr removeObject:timer];
-                }
-                
-            }
-            
-            times ++;
-        });
-        dispatch_resume(timer);
+        }else if ([val isKindOfClass:[NSNumber class]]){
+            NSNumber *valResult = (NSNumber *)val;
+            value = [valResult longValue];
+        }
+        [[OpenInstallSDK defaultManager] reportEffectPoint:effectPoint effectValue:value];
     }
-    
 }
 
 #pragma mark "OpenInstallDelegate"
 /**
- * 安装时获取自定义h5页面参数（使用控制中心提供的渠道统计时，渠道编号也会返回给开发者）
- * @ param params 动态参数
- * @ return void
+ * 唤醒时获取h5页面动态参数（如果是渠道链接，渠道编号会一起返回）
+ * @param appData 动态参数对象
  */
-- (void)getInstallParamsFromOpenInstall:(NSDictionary *) params withError: (NSError *) error{
+- (void)getWakeUpParams:(nullable OpeninstallData *)appData{
     
-    if (!error) {
-        if (params) {
-            
-            [[NSUserDefaults standardUserDefaults] setValue:params forKey:PARAMS];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }else{
-
-        }
-    }
     
 }
 
-
-/**
- * 唤醒时获取h5页面参数（如果是渠道链接，渠道编号会一起返回）
- * @ param type 链接类型（区分渠道链接和自定义分享h5链接）
- * @ param params 动态参数
- * @ return void
- */
-- (void)getWakeUpParamsFromOpenInstall: (NSDictionary *) params withError: (NSError *) error{
-    
-    if (!error) {
-        if (params) {
-            
-        }else{
-            
-        }
-    }
-
-}
 
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler{
     
@@ -196,10 +120,11 @@
     if ([OpenInstallSDK continueUserActivity:userActivity]){
         
         return YES;
-    }else{
-        //其他代码；
-        return YES;
     }
+    
+    //其他代码；
+    return YES;
+    
     
 }
 
