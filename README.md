@@ -34,10 +34,10 @@ window.openinstall.getInstall(function(data){
 ### 拉起参数获取
 调用以下代码注册拉起回调，应尽早调用。如在 `deviceready` 事件回调之时注册
 ``` js
-window.openinstall.registerWakeUpHandler((data)=>{
+window.openinstall.registerWakeUpHandler(function(data){
   console.log("openinstall.wakeup success : channel=" + data.channel + ", data=" + data.data);
-}, (error)=>{
-  console.log("openinstall.wakeup error : " + error)
+}, function(msg){
+  console.log("openinstall.wakeup error : " + msg)
 });
 ```
 __注意__：对于 iOS，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(详细步骤请参考[openinstall官方文档](https://www.openinstall.io))
