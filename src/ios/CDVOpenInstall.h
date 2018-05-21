@@ -9,13 +9,17 @@
 #import <Cordova/CDVPlugin.h>
 #import "OpenInstallSDK.h"
 
+extern NSString* const CDVOpenInstallUniversalLinksNotification;
+extern NSString* const CDVOpenInstallSchemeNotification;
+
 @interface CDVOpenInstall : CDVPlugin<OpenInstallDelegate,UIApplicationDelegate>
 
 @property (nonatomic, copy) NSString *appkey;
-@property (nonatomic, strong) NSString *currentCallbackId;
+@property (nonatomic, copy) NSString *currentCallbackId;
+@property (nonatomic, copy) NSString *wakeupCallbackId;
 
 -(void)getInstall:(CDVInvokedUrlCommand *)command;//获取动态安装参数
--(void)getWakeUp:(CDVInvokedUrlCommand *)command;//获取动态唤醒参数，ios暂不支持
+-(void)registerWakeUpHandler:(CDVInvokedUrlCommand *)command;//注册获取唤醒参数的方法
 -(void)reportRegister:(CDVInvokedUrlCommand *)command;//注册统计
 -(void)reportEffectPoint:(CDVInvokedUrlCommand *)command;//渠道效果统计
 @end

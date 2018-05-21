@@ -10,6 +10,9 @@
 
 #define PARAMS @"getInstallParamsFromOpenInstall_params"
 
+NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUniversalLinksNotification";
+NSString* const CDVOpenInstallSchemeNotification = @"CDVOpenInstallSchemeNotification";
+
 @interface CDVOpenInstall()
 
 @property (nonatomic, strong) NSMutableArray *timeoutTimersArr;
@@ -20,12 +23,33 @@
 
 #pragma mark "API"
 - (void)pluginInitialize {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUniversallinksHandler:) name:CDVOpenInstallUniversalLinksNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setSchemeUrlHandler:) name:CDVOpenInstallSchemeNotification object:nil];
     NSString* appKey = [[self.commandDelegate settings] objectForKey:@"com.openinstall.app_key"];
+    [OpenInstallSDK defaultManager];
     if (appKey){
         self.appkey = appKey;
         [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
     }
+}
+-(void)setUniversallinksHandler:(NSNotification *)obj{
     
+    if (obj.object) {
+        if ([obj.object isKindOfClass:[NSURL class]]) {
+            NSUserActivity *activity = [[NSUserActivity alloc]initWithActivityType:NSUserActivityTypeBrowsingWeb];
+            activity.webpageURL = obj.object;
+            [OpenInstallSDK continueUserActivity:activity];
+        }
+    }
+}
+
+-(void)setSchemeUrlHandler:(NSNotification *)obj{
+    
+    if (obj.object) {
+        if ([obj.object isKindOfClass:[NSURL class]]) {
+            [OpenInstallSDK handLinkURL:obj.object];
+        }
+    }
 }
 
 -(void)getInstall:(CDVInvokedUrlCommand *)command{
@@ -51,15 +75,16 @@
             [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
             return;
         }
-        NSDictionary *dynamicData;
         NSString *channelID = @"";
+        NSString *datas = @"";
         if (appData.data) {
-            dynamicData = appData.data;
+            datas = [self jsonStringWithObject:appData.data];
         }
         if (appData.channelCode) {
             channelID = appData.channelCode;
         }
-        NSDictionary *installDicResult = @{@"channel":channelID,@"data":dynamicData.count?dynamicData:@""};
+        NSDictionary *installDicResult = @{@"channel":channelID,@"data":datas};
+
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
         
@@ -68,10 +93,13 @@
     }];
 
 }
+-(void)registerWakeUpHandler:(CDVInvokedUrlCommand *)command{
+    
+    self.wakeupCallbackId = command.callbackId;
+}
 
 -(void)getWakeUp:(CDVInvokedUrlCommand *)command{
     
-   
 }
 
 -(void)reportRegister:(CDVInvokedUrlCommand *)command{
@@ -110,23 +138,30 @@
  */
 - (void)getWakeUpParams:(nullable OpeninstallData *)appData{
     
-    
-}
-
-
-- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler{
-    
-    //判断是否通过OpenInstall Universal Links 唤起App
-    if ([OpenInstallSDK continueUserActivity:userActivity]){
-        
-        return YES;
+    if (!appData.data&&!appData.channelCode) {
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"channel": @"", @"data": @""}];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
+        return;
     }
+
+    NSString *channelID = @"";
+    NSString *datas = @"";
+    if (appData.data) {
+        datas = [self jsonStringWithObject:appData.data];
+    }
+    if (appData.channelCode) {
+        channelID = appData.channelCode;
+    }
+    NSDictionary *wakeupDicResult = @{@"channel":channelID,@"data":datas};
     
-    //其他代码；
-    return YES;
-    
-    
+    if (self.wakeupCallbackId) {
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
+    }
+
+//    [self.commandDelegate evalJs:[NSString stringWithFormat:@"wakeUpCallBackFunction(%@)",[self jsonStringWithObject:wakeupDicResult]]];
 }
+
 
 //判断是否为整形：
 
@@ -152,5 +187,24 @@
     
 }
 
+- (NSString *)jsonStringWithObject:(id)jsonObject{
+    // 将字典或者数组转化为JSON串
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:jsonObject
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData
+                                                 encoding:NSUTF8StringEncoding];
+    
+    if ([jsonString length] > 0 && error == nil){
+        
+        jsonString = [jsonString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        
+        return jsonString;
+    }else{
+        return @"";
+    }
+}
 
 @end
