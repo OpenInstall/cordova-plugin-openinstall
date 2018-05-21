@@ -40,7 +40,7 @@ window.openinstall.registerWakeUpHandler((data)=>{
   console.log("openinstall.wakeup error : " + error)
 });
 ```
-__注意__：对于iOS，为确保能正常跳转，AppID必须开启Associated Domains功能，请到 https://developer.apple.com，选择Certificate, Identifiers & Profiles，选择相应的AppID，开启Associated Domains。注意：当AppID重新编辑过之后，需要更新相应的mobileprovision证书。(详细步骤请参考[openinstall官方文档](https://www.openinstall.io))
+__注意__：对于 iOS，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(详细步骤请参考[openinstall官方文档](https://www.openinstall.io))
 
 ### 注册上报
 ``` js
