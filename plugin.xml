@@ -18,6 +18,7 @@
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="OpenInstallPlugin">
                 <param name="android-package" value="io.openinstall.cordova.OpenInstallPlugin"/>
+				<param name="onload" value="true" />
             </feature>
         </config-file>
 
