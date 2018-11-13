@@ -11,7 +11,6 @@
 #define PARAMS @"getInstallParamsFromOpenInstall_params"
 
 NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUniversalLinksNotification";
-NSString* const CDVOpenInstallSchemeNotification = @"CDVOpenInstallSchemeNotification";
 
 @interface CDVOpenInstall()
 
@@ -24,7 +23,6 @@ NSString* const CDVOpenInstallSchemeNotification = @"CDVOpenInstallSchemeNotific
 #pragma mark "API"
 - (void)pluginInitialize {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUniversallinksHandler:) name:CDVOpenInstallUniversalLinksNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setSchemeUrlHandler:) name:CDVOpenInstallSchemeNotification object:nil];
     NSString* appKey = [[self.commandDelegate settings] objectForKey:@"com.openinstall.app_key"];
     [OpenInstallSDK defaultManager];
     if (appKey){
@@ -43,12 +41,14 @@ NSString* const CDVOpenInstallSchemeNotification = @"CDVOpenInstallSchemeNotific
     }
 }
 
--(void)setSchemeUrlHandler:(NSNotification *)obj{
+#pragma mark "CDVPlugin Overrides"
+- (void)handleOpenURL:(NSNotification *)notification
+{
+    NSURL* url = [notification object];
     
-    if (obj.object) {
-        if ([obj.object isKindOfClass:[NSURL class]]) {
-            [OpenInstallSDK handLinkURL:obj.object];
-        }
+    if ([url isKindOfClass:[NSURL class]])
+    {
+        [OpenInstallSDK handLinkURL:url];
     }
 }
 
