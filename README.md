@@ -4,8 +4,7 @@ openinstall 的 cordova 插件
 ## 安装插件
 
 ```
-$ cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
-
+cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
 ```
 
 ## 调用API
