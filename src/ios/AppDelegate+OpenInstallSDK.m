@@ -26,15 +26,4 @@
     return YES;
 }
 
--(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation{
-    //判断是否通过OpenInstall URL Scheme 唤起App
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:CDVOpenInstallSchemeNotification object:url];
-    });
-    
-    //其他第三方回调；
-    return YES;
-    
-}
-
 @end
