@@ -65,9 +65,6 @@ window.openinstall.reportRegister();
 
 调用接口前，请先进入管理后台“效果点管理”中添加效果点  
 
-![效果点管理](./resources/effect_point.png)  
-
-调用接口时，请保证代码中的效果点ID与后台创建的效果点ID一致  
 ``` js
 window.openinstall.reportEffectPoint("effect_test", 1);
 ```
