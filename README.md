@@ -29,7 +29,7 @@ __注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links
 - 添加openinstall官网后台中应用对应的关联域名（iOS集成->iOS应用配置->关联域名(Associated Domains)）
 
 
-#### 3 携带参数安装 <span style="margin-left: 5px;display: inline-block;background: red;color: #fff;border-radius: 3px;padding: 2px 3px;font-size: 12px;">（高级版功能）</span>
+#### 3 携带参数安装 （高级版功能）
 ##### 获取安装参数  
 ``` js
 window.openinstall.getInstall(function(data){
@@ -51,7 +51,7 @@ window.openinstall.getInstall(function(data){
 {"channel": "渠道号", "data": "自定义数据"}
 ```
 
-#### 4 渠道统计 <span style="margin-left: 5px;display: inline-block;background: red;color: #fff;border-radius: 3px;padding: 2px 3px;font-size: 12px;">（高级版功能）</span>  
+#### 4 渠道统计 （高级版功能）  
 SDK 会自动完成访问量、点击量、安装量、活跃量、留存率等统计工作。
 
 ##### 4.1 注册量统计  
