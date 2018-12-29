@@ -48,7 +48,7 @@ window.openinstall.getInstall(function(data){
 ```
 成功回调的data数据格式  
 ``` json
-{"channel": "渠道号", "data": "自定义数据"}
+{"channel": "渠道号", "data": {"自定义key": "自定义value"}}
 ```
 
 #### 4 渠道统计 （高级版功能）  
