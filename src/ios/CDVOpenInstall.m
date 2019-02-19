@@ -55,35 +55,17 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
 -(void)getInstall:(CDVInvokedUrlCommand *)command{
     
     self.currentCallbackId = command.callbackId;
-    float outtime = 5.0f;
+    float outtime = 10.0f;
     if (command.arguments.count != 0) {
         id time = [command.arguments objectAtIndex:0];
-        if ([time isKindOfClass:[NSString class]]) {
-            NSString *timeResult = (NSString *)time;
-            if ([self isPureInt:timeResult]||[self isPureFloat:timeResult]) {
-                outtime = [timeResult floatValue];
-            }
-        }else if ([time isKindOfClass:[NSNumber class]]){
+        if ([time isKindOfClass:[NSNumber class]]){
             NSNumber *timeResult = (NSNumber *)time;
             outtime = [timeResult floatValue];
         }
     }
     [[OpenInstallSDK defaultManager] getInstallParmsWithTimeoutInterval:outtime completed:^(OpeninstallData * _Nullable appData) {
         
-        if (!appData.data&&!appData.channelCode) {
-            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"channel": @"", @"data": @""}];
-            [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
-            return;
-        }
-        NSString *channelID = @"";
-        NSString *datas = @"";
-        if (appData.data) {
-            datas = [self jsonStringWithObject:appData.data];
-        }
-        if (appData.channelCode) {
-            channelID = appData.channelCode;
-        }
-        NSDictionary *installDicResult = @{@"channel":channelID,@"data":datas};
+        NSDictionary *installDicResult = @{@"channel":appData.channelCode?:@"",@"data":appData.data?:@""};
 
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
@@ -118,12 +100,7 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
             effectPoint = (NSString *)point;
         }
         id val = [command.arguments objectAtIndex:1];
-        if ([val isKindOfClass:[NSString class]]) {
-            NSString *valResult = (NSString *)val;
-            if ([self isPureInt:valResult]||[self isPureFloat:valResult]) {
-                value = [valResult longLongValue];
-            }
-        }else if ([val isKindOfClass:[NSNumber class]]){
+        if ([val isKindOfClass:[NSNumber class]]){
             NSNumber *valResult = (NSNumber *)val;
             value = [valResult longValue];
         }
@@ -138,21 +115,7 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
  */
 - (void)getWakeUpParams:(nullable OpeninstallData *)appData{
     
-    if (!appData.data&&!appData.channelCode) {
-        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"channel": @"", @"data": @""}];
-        [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
-        return;
-    }
-
-    NSString *channelID = @"";
-    NSString *datas = @"";
-    if (appData.data) {
-        datas = [self jsonStringWithObject:appData.data];
-    }
-    if (appData.channelCode) {
-        channelID = appData.channelCode;
-    }
-    NSDictionary *wakeupDicResult = @{@"channel":channelID,@"data":datas};
+    NSDictionary *wakeupDicResult = @{@"channel":appData.channelCode?:@"",@"data":appData.data?:@""};
     
     if (self.wakeupCallbackId) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
@@ -162,49 +125,9 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
 //    [self.commandDelegate evalJs:[NSString stringWithFormat:@"wakeUpCallBackFunction(%@)",[self jsonStringWithObject:wakeupDicResult]]];
 }
 
-
-//判断是否为整形：
-
-- (BOOL)isPureInt:(NSString*)string{
-    
-    NSScanner* scan = [NSScanner scannerWithString:string];
-    
-    int val;
-    
-    return[scan scanInt:&val] && [scan isAtEnd];
-    
-}
-
-//判断是否为浮点形：
-
-- (BOOL)isPureFloat:(NSString*)string{
-    
-    NSScanner* scan = [NSScanner scannerWithString:string];
-    
-    float val;
-    
-    return[scan scanFloat:&val] && [scan isAtEnd];
-    
-}
-
-- (NSString *)jsonStringWithObject:(id)jsonObject{
-    // 将字典或者数组转化为JSON串
-    NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:jsonObject
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-    
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData
-                                                 encoding:NSUTF8StringEncoding];
-    
-    if ([jsonString length] > 0 && error == nil){
-        
-        jsonString = [jsonString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        
-        return jsonString;
-    }else{
-        return @"";
-    }
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
