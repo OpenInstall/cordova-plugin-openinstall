@@ -2,7 +2,10 @@
 openinstall 的 cordova 插件
 
 ### 安装插件
-注册并创建应用，获取 openinstall 为应用分配的 appkey 和 scheme，使用下列命令安装并配置 openinstall 插件  
+注册并创建应用，获取 openinstall 为应用分配的 appkey 和 scheme  
+(scheme的值详细获取位置：openinstall应用控制台->Android集成->Android应用配置，iOS同理)  
+
+使用下列命令安装并配置 openinstall 插件
 ```
 cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
 ```
@@ -22,11 +25,11 @@ window.openinstall.registerWakeUpHandler(function(data){
   console.log("openinstall.wakeup error : " + msg)
 });
 ```
-__注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(详细步骤请参考[openinstall官方文档](https://www.openinstall.io))  
+__注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(图文步骤请参考[iOS集成指南](https://www.openinstall.io/doc/ios_sdk.html))  
 - 在左侧导航器中点击您的项目  
 - 选择'Capabilities'标签  
 - 打开'Associated Domains'开关  
-- 添加openinstall官网后台中应用对应的关联域名（iOS集成->iOS应用配置->关联域名(Associated Domains)）
+- 添加openinstall官网后台中应用对应的关联域名（openinstall应用控制台->iOS集成->iOS应用配置->关联域名(Associated Domains)）
 
 
 #### 3 携带参数安装 （高级版功能）
