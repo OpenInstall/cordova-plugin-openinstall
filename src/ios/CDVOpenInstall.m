@@ -65,7 +65,15 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
     }
     [[OpenInstallSDK defaultManager] getInstallParmsWithTimeoutInterval:outtime completed:^(OpeninstallData * _Nullable appData) {
         
-        NSDictionary *installDicResult = @{@"channel":appData.channelCode?:@"",@"data":appData.data?:@""};
+        NSString *channelID = @"";
+        NSString *datas = @"";
+        if (appData.data) {
+            datas = [self jsonStringWithObject:appData.data];
+        }
+        if (appData.channelCode) {
+            channelID = appData.channelCode;
+        }
+        NSDictionary *installDicResult = @{@"channel":channelID,@"data":datas};
 
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:installDicResult];
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
@@ -115,7 +123,15 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
  */
 - (void)getWakeUpParams:(nullable OpeninstallData *)appData{
     
-    NSDictionary *wakeupDicResult = @{@"channel":appData.channelCode?:@"",@"data":appData.data?:@""};
+    NSString *channelID = @"";
+    NSString *datas = @"";
+    if (appData.data) {
+        datas = [self jsonStringWithObject:appData.data];
+    }
+    if (appData.channelCode) {
+        channelID = appData.channelCode;
+    }
+    NSDictionary *wakeupDicResult = @{@"channel":channelID,@"data":datas};
     
     if (self.wakeupCallbackId) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
@@ -128,6 +144,34 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (NSString *)jsonStringWithObject:(id)jsonObject{
+    
+    id arguments = (jsonObject == nil ? [NSNull null] : jsonObject);
+    
+    NSArray* argumentsWrappedInArr = [NSArray arrayWithObject:arguments];
+    
+    NSString* argumentsJSON = [self cp_JSONString:argumentsWrappedInArr];
+    
+    argumentsJSON = [argumentsJSON substringWithRange:NSMakeRange(1, [argumentsJSON length] - 2)];
+    
+    return argumentsJSON;
+}
+- (NSString *)cp_JSONString:(NSArray *)array{
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array
+                                                       options:0
+                                                         error:&error];
+    
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData
+                                                 encoding:NSUTF8StringEncoding];
+    
+    if ([jsonString length] > 0 && error == nil){
+        return jsonString;
+    }else{
+        return @"";
+    }
 }
 
 @end
