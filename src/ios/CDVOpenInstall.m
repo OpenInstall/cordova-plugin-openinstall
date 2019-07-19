@@ -8,10 +8,6 @@
 
 #import "CDVOpenInstall.h"
 
-#define PARAMS @"getInstallParamsFromOpenInstall_params"
-
-NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUniversalLinksNotification";
-
 @interface CDVOpenInstall()
 
 @property (nonatomic, strong) NSMutableArray *timeoutTimersArr;
@@ -22,7 +18,7 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
 
 #pragma mark "API"
 - (void)pluginInitialize {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUniversallinksHandler:) name:CDVOpenInstallUniversalLinksNotification object:nil];
+    
     NSString* appKey = [[self.commandDelegate settings] objectForKey:@"com.openinstall.app_key"];
     [OpenInstallSDK defaultManager];
     if (appKey){
@@ -30,15 +26,11 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
         [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
     }
 }
--(void)setUniversallinksHandler:(NSNotification *)obj{
-    
-    if (obj.object) {
-        if ([obj.object isKindOfClass:[NSURL class]]) {
-            NSUserActivity *activity = [[NSUserActivity alloc]initWithActivityType:NSUserActivityTypeBrowsingWeb];
-            activity.webpageURL = obj.object;
-            [OpenInstallSDK continueUserActivity:activity];
-        }
+-(BOOL)setUniversallinksHandler:(NSUserActivity *)userActivity{
+    if ([OpenInstallSDK continueUserActivity:userActivity]) {
+        return YES;
     }
+    return NO;
 }
 
 #pragma mark "CDVPlugin Overrides"
@@ -81,10 +73,21 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
         self.currentCallbackId = nil;
         
     }];
-
+    
 }
 -(void)registerWakeUpHandler:(CDVInvokedUrlCommand *)command{
     
+    NSDictionary *resultDic;
+    @synchronized(self){
+        if (self.wakeupDic) {
+            resultDic = [self.wakeupDic copy];
+        }
+    }
+    if (resultDic.count != 0) {
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDic];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+        self.wakeupDic = nil;
+    }
     self.wakeupCallbackId = command.callbackId;
 }
 
@@ -133,12 +136,19 @@ NSString* const CDVOpenInstallUniversalLinksNotification = @"CDVOpenInstallUnive
     }
     NSDictionary *wakeupDicResult = @{@"channel":channelID,@"data":datas};
     
-    if (self.wakeupCallbackId) {
+    NSString *wakeupcallbacId;
+    @synchronized(self){
+        wakeupcallbacId = [self.wakeupCallbackId copy];
+    }
+    if (wakeupcallbacId) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
         [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
+    }else{
+        @synchronized(self){
+            self.wakeupDic = [[NSDictionary alloc]init];
+            self.wakeupDic = wakeupDicResult;
+        }
     }
-
-//    [self.commandDelegate evalJs:[NSString stringWithFormat:@"wakeUpCallBackFunction(%@)",[self jsonStringWithObject:wakeupDicResult]]];
 }
 
 - (void)dealloc
