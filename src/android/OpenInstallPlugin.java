@@ -111,9 +111,13 @@ public class OpenInstallPlugin extends CordovaPlugin {
           } catch (JSONException e) {
 //              e.printStackTrace();
           }
-          callbackContext.success(jsonObject);
+          PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject);
+          result.setKeepCallback(true);
+          callbackContext.sendPluginResult(result);
         } else {
-          callbackContext.success();
+          PluginResult result = new PluginResult(PluginResult.Status.OK);
+          result.setKeepCallback(true);
+          callbackContext.sendPluginResult(result);
         }
       }
     });
