@@ -85,6 +85,7 @@
     }
     if (resultDic.count != 0) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDic];
+        commandResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
         self.wakeupDic = nil;
     }
@@ -142,6 +143,7 @@
     }
     if (wakeupcallbacId) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
+        commandResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
     }else{
         @synchronized(self){
