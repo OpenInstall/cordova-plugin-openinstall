@@ -7,6 +7,7 @@
 //
 
 #import "CDVOpenInstall.h"
+#import "CDVOpenInstallStorage.h"
 
 @interface CDVOpenInstall()
 
@@ -83,12 +84,21 @@
             resultDic = [self.wakeupDic copy];
         }
     }
+    self.wakeupCallbackId = command.callbackId;
     if (resultDic.count != 0) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDic];
+        commandResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
         self.wakeupDic = nil;
+    }else{
+        if ([CDVOpenInstallStorage shareInstance].schemeUrl) {
+            [OpenInstallSDK handLinkURL:[CDVOpenInstallStorage shareInstance].schemeUrl];
+            [CDVOpenInstallStorage shareInstance].schemeUrl = nil;
+        }else if ([CDVOpenInstallStorage shareInstance].userActivity){
+            [OpenInstallSDK continueUserActivity:[CDVOpenInstallStorage shareInstance].userActivity];
+            [CDVOpenInstallStorage shareInstance].userActivity = nil;
+        }
     }
-    self.wakeupCallbackId = command.callbackId;
 }
 
 -(void)getWakeUp:(CDVInvokedUrlCommand *)command{
@@ -142,6 +152,7 @@
     }
     if (wakeupcallbacId) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:wakeupDicResult];
+        commandResult.keepCallback = @(YES);
         [self.commandDelegate sendPluginResult:commandResult callbackId:self.wakeupCallbackId];
     }else{
         @synchronized(self){
