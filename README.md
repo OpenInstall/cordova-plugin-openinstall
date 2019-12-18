@@ -1,7 +1,7 @@
 # cordova-plugin-openinstall
 openinstall 的 cordova 插件
 
-### 安装插件
+### 一、安装插件
 注册并创建应用，获取 openinstall 为应用分配的 appkey 和 scheme  
 (scheme的值详细获取位置：openinstall应用控制台->Android集成->Android应用配置，iOS同理)  
 
@@ -10,7 +10,7 @@ openinstall 的 cordova 插件
 cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
 ```
 
-### 调用API
+### 二、调用API
 
 #### 1 快速下载
 如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可(这里指安装插件)
@@ -76,3 +76,6 @@ window.openinstall.reportEffectPoint("effect_test", 1);
   
 调用接口后，可在后台查看效果点统计数据
 
+### 三、导出apk/api包并上传
+- 代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
+- 上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。
