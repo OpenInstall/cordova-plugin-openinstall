@@ -92,7 +92,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
           callbackContext.success();
         }
       }
-    }, timeout * 1000);
+    }, timeout);
   }
 
   private void getWakeUp(Intent intent, final CallbackContext callbackContext) {
