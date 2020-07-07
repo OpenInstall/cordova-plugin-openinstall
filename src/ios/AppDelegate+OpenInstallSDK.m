@@ -9,6 +9,7 @@
 //#import "AppDelegate+OpenInstallSDK.h"
 #import "CDVOpenInstall.h"
 #import "CDVOpenInstallStorage.h"
+#import <objc/runtime.h>
 
 #define CDVOPENINSTALLPARAMS @"openinstallplugin"
 
@@ -18,41 +19,32 @@
 
 @implementation AppDelegate (OpenInstallSDK)
 
--(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler{
-    CDVOpenInstall *plugin = [self.viewController getCommandInstance:CDVOPENINSTALLPARAMS];
-    if (plugin == nil) {
-        if (userActivity.webpageURL) {
-            [CDVOpenInstallStorage shareInstance].userActivity = userActivity;
-            [[NSNotificationCenter defaultCenter]removeObserver:self
-                                                           name:CDVPluginHandleOpenURLNotification
-                                                         object:nil];
+static BOOL systemFuncExist = NO;
+
++ (void)load {
+    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+    if ([processInfo respondsToSelector:@selector(operatingSystemVersion)]) {
+        Method systemFunc = class_getInstanceMethod(self, @selector(application:continueUserActivity:restorationHandler:));
+        Method cooFunc = class_getInstanceMethod(self, @selector(cooFuncApplication:continueUserActivity:restorationHandler:));
+        if (systemFunc) {
+            method_exchangeImplementations(systemFunc, cooFunc);
+            systemFuncExist = YES;
+        } else {
+            const char *typeEncoding = method_getTypeEncoding(cooFunc);
+            class_addMethod(self, @selector(application:continueUserActivity:restorationHandler:), method_getImplementation(cooFunc), typeEncoding);
         }
+    }
+}
+
+-(BOOL)cooFuncApplication:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler{
+    if (systemFuncExist) {
+        [self cooFuncApplication:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+    }
+    CDVOpenInstall *plugin = [self.viewController getCommandInstance:CDVOPENINSTALLPARAMS];
+    if (plugin==nil) {
         return NO;
     }
-    
     return [plugin setUniversallinksHandler:userActivity];
-}
-
-+ (void)initialize
-{
-    [[NSNotificationCenter defaultCenter]addObserver:self
-                                            selector:@selector(getSchemeHandleUrl:)
-                                                name:CDVPluginHandleOpenURLNotification object:nil];
-}
-
-+ (void)getSchemeHandleUrl:(NSNotification *)notification{
-    NSURL* url = [notification object];
-    
-    if ([url isKindOfClass:[NSURL class]]) {
-        [CDVOpenInstallStorage shareInstance].schemeUrl = url;
-    }
-    [[NSNotificationCenter defaultCenter]removeObserver:self
-                                                   name:CDVPluginHandleOpenURLNotification
-                                                 object:nil];
-}
-
-- (void)dealloc{
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end

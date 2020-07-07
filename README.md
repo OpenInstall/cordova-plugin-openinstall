@@ -25,11 +25,31 @@ window.openinstall.registerWakeUpHandler(function(data){
   console.log("openinstall.wakeup error : " + msg)
 });
 ```
-__注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(图文步骤请参考[iOS集成指南](https://www.openinstall.io/doc/ios_sdk.html))  
+__注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(图文步骤请参考[Cordova接入指南](https://www.openinstall.io/doc/cordova_sdk.html))  
 - 在左侧导航器中点击您的项目  
 - 选择'Capabilities'标签  
 - 打开'Associated Domains'开关  
 - 添加openinstall官网后台中应用对应的关联域名（openinstall应用控制台->iOS集成->iOS应用配置->关联域名(Associated Domains)）
+
+**openinstall完全兼容微信openSDK1.8.6以上版本的通用链接跳转功能，注意微信SDK初始化方法中，传入正确格式的universal link链接：**  
+
+``` objc
+//your_wxAppID从微信后台获取，yourAppkey从openinstall后台获取
+[WXApi registerApp:@"your_wxAppID" universalLink:@"https://yourAppkey.openinstall.io/ulink/"];
+```
+
+- **使用 微信相关cordova插件 时，如果要传`universallink`参数的话，请和上面代码中的保持一致**
+
+- 微信开放平台后台Universal links配置，要和上面代码中的保持一致  
+
+![微信后台配置](res/wexinUL.jpg)  
+
+- 如果使用了类似 `cordova-plugin-wechat` 插件，为了互相兼容，请注意Xcode工程->TARGETS->Build Phases->Compile Sources，  
+检查`AppDelegate+Wechat.m`和`AppDelegate+OpenInstallSDK.m`是否按从上往下顺序排放：
+
+![插件兼容](res/cordovawo.png)
+
+- 微信SDK更新参考[微信开放平台更新文档](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/iOS.html)  
 
 
 #### 3 携带参数安装 （高级版功能）
@@ -79,3 +99,6 @@ window.openinstall.reportEffectPoint("effect_test", 1);
 ### 三、导出apk/api包并上传
 - 代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
 - 上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。
+
+![上传安装包](res/guide2.jpg)  
+
