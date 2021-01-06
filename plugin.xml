@@ -48,7 +48,7 @@
         </edit-config>
 
         <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
-        <lib-file src="src/android/lib/OpenInstall_v2.4.1.jar" target-dir="libs" />
+        <lib-file src="src/android/lib/OpenInstall_v2.5.0.jar" target-dir="libs" />
 
     </platform>
     

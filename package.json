@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-openinstall",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "cordova": {
     "id": "cordova-plugin-openinstall",
     "platforms": [
