@@ -2,14 +2,6 @@ var exec = require('cordova/exec');
 
 module.exports = {
     
-	/**
-	 * 初始化
-	 */
-	init: function(){
-	    function pass() {};
-        exec(pass, pass, "OpenInstallPlugin", "init", []);		
-	}
-	
     /**
      * 获取安装参数
      * @param onSuccess 成功回调：数据格式为 {'channel': 1002, 'data': {'key': 'value'}}
