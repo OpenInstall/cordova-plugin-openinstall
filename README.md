@@ -9,11 +9,17 @@ openinstall 的 cordova 插件
 ```
 cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
 ```
+### 二、初始化
+**插件自 2.0.0 版本开始，需要用户调用初始化接口完成SDK的初始化**  
+App 启动时，请确保用户同意《隐私政策》之后，再初始化openinstall SDK；如果用户不同意，则不进行openinstall SDK初始化
+``` js
+window.openinstall.init();
+```
 
-### 二、调用API
+### 三、功能集成
 
 #### 1 快速下载
-如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可(这里指安装插件)
+如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可
 
 #### 2 一键拉起
 ##### 拉起参数获取
@@ -96,7 +102,7 @@ window.openinstall.reportEffectPoint("effect_test", 1);
   
 调用接口后，可在后台查看效果点统计数据
 
-### 三、导出apk/api包并上传
+### 四、导出apk/api包并上传
 - 代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
 - 上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。
 
