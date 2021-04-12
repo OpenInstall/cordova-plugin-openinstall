@@ -31,14 +31,14 @@ __注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links
 - 打开'Associated Domains'开关  
 - 添加openinstall官网后台中应用对应的关联域名（openinstall应用控制台->iOS集成->iOS应用配置->关联域名(Associated Domains)）
 
-**openinstall完全兼容微信openSDK1.8.6以上版本的通用链接跳转功能，注意微信SDK初始化方法中，传入正确格式的universal link链接：**  
+**以下配置为可选项**  
 
+openinstall可兼容微信openSDK1.8.6以上版本的通用链接跳转功能，注意微信SDK初始化方法中，传入正确格式的universal link链接：  
 ``` objc
 //your_wxAppID从微信后台获取，yourAppkey从openinstall后台获取
 [WXApi registerApp:@"your_wxAppID" universalLink:@"https://yourAppkey.openinstall.io/ulink/"];
 ```
-
-- **使用 微信相关cordova插件 时，如果要传`universallink`参数的话，请和上面代码中的保持一致**
+- 使用 微信相关cordova插件 时，如果要传`universallink`参数的话，请和上面代码中的保持一致
 
 - 微信开放平台后台Universal links配置，要和上面代码中的保持一致  
 
