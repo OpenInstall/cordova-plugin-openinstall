@@ -125,7 +125,7 @@ window.openinstall.reportEffectPoint("effect_test", 1);
     var options = {
         adEnabled: true, 
     }
-    window.openinstall.config(options);
+    window.openinstall.configAndroid(options);
 ```
 options 可选参数如下：  
 - adEnabled: true   
