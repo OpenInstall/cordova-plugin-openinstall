@@ -1,9 +1,11 @@
 # cordova-plugin-openinstall
 openinstall 的 cordova 插件
 
-### 一、安装插件
-注册并创建应用，获取 openinstall 为应用分配的 appkey 和 scheme  
-(scheme的值详细获取位置：openinstall应用控制台->Android集成->Android应用配置，iOS同理)  
+## 一、安装插件
+
+前往 [openinstall 官网](https://www.openinstall.io/)，注册账户，登录管理控制台，创建应用后，跳过 "集成指引"，在 "应用集成" 的对应平台的 "应用配置" 中获取 `appkey` 和 `scheme` 以及 iOS 的关联域名。
+
+![获取appkey和scheme](https://res.cdn.openinstall.io/doc/ios-appkey.png)
 
 使用下列命令安装并配置 openinstall 插件
 ```
@@ -15,15 +17,15 @@ cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=appk
 cordova plugin rm cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=appkey --variable OPENINSTALL_SCHEME=scheme
 ```
 
-### 二、调用API
+## 二、调用API
 
-#### 1 快速下载
-如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可
+### 1 初始化
+App 启动时，请确保用户同意《隐私政策》之后，再调用初始化；如果用户不同意，则不进行openinstall SDK初始化。参考 [应用合规指南](https://www.openinstall.io/doc/rules.html)   
 ``` js
 window.openinstall.init();
 ```
-#### 2 一键拉起
-##### 拉起参数获取
+### 2 快速安装和一键跳转
+#### 拉起参数获取
 调用以下代码注册拉起回调，应尽早调用。如在 `deviceready` 事件回调之时注册
 ``` js
 window.openinstall.registerWakeUpHandler(function(data){
@@ -53,18 +55,18 @@ openinstall可兼容微信openSDK1.8.6以上版本的通用链接跳转功能，
 
 - 微信开放平台后台Universal links配置，要和上面代码中的保持一致  
 
-![微信后台配置](res/wexinUL.jpg)  
+![微信后台配置](https://res.cdn.openinstall.io/doc/cordova-wx-ulink.jpg)  
 
 - 如果使用了类似 `cordova-plugin-wechat` 插件，为了互相兼容，请注意Xcode工程->TARGETS->Build Phases->Compile Sources，  
 检查`AppDelegate+Wechat.m`和`AppDelegate+OpenInstallSDK.m`是否按从上往下顺序排放：
 
-![插件兼容](res/cordovawo.png)
+![插件兼容](https://res.cdn.openinstall.io/doc/cordova-wx-sort.png)  
 
 - 微信SDK更新参考[微信开放平台更新文档](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/iOS.html)  
 
 
-#### 3 携带参数安装 （高级版功能）
-##### 获取安装参数  
+### 3 携带参数安装 （高级版功能）
+#### 获取安装参数  
 ``` js
 window.openinstall.getInstall(function(data){
     console.log('openinstall.getInstall success: ' + JSON.stringify(data));
@@ -85,60 +87,63 @@ window.openinstall.getInstall(function(data){
 {"channel": "渠道号", "data": {"自定义key": "自定义value"}}
 ```
 
-#### 4 渠道统计 （高级版功能）  
-SDK 会自动完成访问量、点击量、安装量、活跃量、留存率等统计工作。
+### 4 渠道统计 （高级版功能）  
+SDK 会自动完成访问量、点击量、安装量、活跃量、留存率等统计工作。其它业务相关统计由开发人员使用 api 上报
 
-##### 4.1 注册量统计  
-如需统计每个渠道的注册量（对评估渠道质量很重要），可根据自身的业务规则，在确保用户完成 app 注册的情况下调用相关api  
+#### 4.1 注册量统计  
+根据自身的业务规则，在确保用户完成 app 注册的情况下调用 api  
 ``` js
 window.openinstall.reportRegister();
 ```
 
-##### 4.2 渠道效果统计  
-效果点建立在渠道基础之上，主要用来统计终端用户对某些特殊业务的使用效果，如充值金额，分享次数等等。  
-
-调用接口前，请先进入管理后台“效果点管理”中添加效果点  
+#### 4.2 渠道效果统计  
+统计终端用户对某些特殊业务的使用效果，如充值金额，分享次数等等。  
+请在 [openinstall 控制台](https://developer.openinstall.io/) 的 “效果点管理” 中添加对应的效果点  
+![创建效果点](https://res.cdn.openinstall.io/doc/effect_point.png)  
+调用接口进行效果点的上报，第一个参数对应控制台中的 **效果点ID**  
 
 ``` js
 window.openinstall.reportEffectPoint("effect_test", 1);
 ```
-第一个参数为“效果点ID”，字符串类型  
-第二个参数为“效果点值”，数字类型  
-  
-调用接口后，可在后台查看效果点统计数据
 
-### 三、导出apk/ipa包并上传
-- 代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
-- 上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。
 
-![上传安装包](res/guide2.jpg)  
+## 三、导出apk/ipa包并上传
 
-----------
+代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
+![上传安装包](https://res.cdn.openinstall.io/doc/upload-ipa-jump.png)  
 
-## 广告平台补充文档
+上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。  
+![在线测试](https://res.cdn.openinstall.io/doc/js-test.png)
+
+## 如有疑问
+
+若您在集成或使用中有任何疑问或者困难，请 [联系我们](https://www.openinstall.io/)。 
+
+---
+
+## 广告平台接入
 
 ### Android平台
 
-#### 广告平台配置
-针对广告平台接入，新增配置接口，在调用 init 之前调用。参考 [广告平台对接Android集成指引](https://www.openinstall.io/doc/ad_android.html)
+1、针对广告平台接入，新增配置接口，在调用 init 之前调用。参考 [广告平台对接Android集成指引](https://www.openinstall.io/doc/ad_android.html)
 ``` js
     var options = {
         adEnabled: true, 
     }
     window.openinstall.configAndroid(options);
 ```
-options 可选参数如下：  
-- adEnabled: true   
-SDK 需要获取广告追踪相关参数
-- macDisabled: true  
-SDK 不需要获取 mac地址
-- imeiDisabled: true  
-SDK 不需要获取 imei
-- gaid: "通过 google api 获取到的 advertisingId"  
-SDK 使用传入的gaid，不再获取gaid
-- oaid: "通过移动安全联盟获取到的 oaid"  
-SDK 使用传入的oaid，不再获取oaid
-#### 权限申请
-针对广告平台，为了精准地匹配到渠道，需要获取设备唯一标识码（IMEI），因此需要做额外的权限申请。  
-请自行进行权限申请，无论用户是否同意授权都要调用初始化
+options 可选参数如下：   
+| 参数名| 参数类型 | 描述 |  
+| --- | --- | --- |
+| adEnabled| bool | 是否需要 SDK 获取广告追踪相关参数 |
+| macDisabled | bool | 是否禁止 SDK 获取 mac 地址 |
+| imeiDisabled | bool | 是否禁止 SDK 获取 imei |
+| gaid | string | 通过 google api 获取到的 advertisingId，SDK 将不再获取gaid |
+| oaid | string | 通过移动安全联盟获取到的 oaid，SDK 将不再获取oaid |
+
+2、为了精准地匹配到渠道，需要获取设备唯一标识码（IMEI），因此需要在 AndroidManifest.xml 中添加权限声明 
+``` xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+```
+3、请自行进行权限申请，在权限申请成功后，再进行openinstall初始化。**无论终端用户是否同意，都要调用初始化**
 
