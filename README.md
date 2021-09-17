@@ -7,23 +7,34 @@ openinstall 的 cordova 插件
 
 使用下列命令安装并配置 openinstall 插件
 ```
-cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=[appkey] --variable OPENINSTALL_SCHEME=[scheme]
+cordova plugin add cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=appkey --variable OPENINSTALL_SCHEME=scheme
+```
+
+*如配置错误，可先卸载再安装插件*
+```
+cordova plugin rm cordova-plugin-openinstall --variable OPENINSTALL_APPKEY=appkey --variable OPENINSTALL_SCHEME=scheme
 ```
 
 ### 二、调用API
 
 #### 1 快速下载
-如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可(这里指安装插件)
-
+如果只需要快速下载功能，无需其它功能（携带参数安装、渠道统计、一键拉起），完成初始化即可
+``` js
+window.openinstall.init();
+```
 #### 2 一键拉起
 ##### 拉起参数获取
 调用以下代码注册拉起回调，应尽早调用。如在 `deviceready` 事件回调之时注册
 ``` js
 window.openinstall.registerWakeUpHandler(function(data){
-  console.log("openinstall.wakeup success : channel=" + data.channel + ", data=" + data.data);
+  console.log("openinstall.wakeup success : " + JSON.stringify(data));
 }, function(msg){
   console.log("openinstall.wakeup error : " + msg)
 });
+```
+成功回调的data数据格式  
+``` json
+{"channel": "渠道号", "data": {"自定义key": "自定义value"}}
 ```
 __注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(图文步骤请参考[Cordova接入指南](https://www.openinstall.io/doc/cordova_sdk.html))  
 - 在左侧导航器中点击您的项目  
@@ -56,7 +67,7 @@ openinstall可兼容微信openSDK1.8.6以上版本的通用链接跳转功能，
 ##### 获取安装参数  
 ``` js
 window.openinstall.getInstall(function(data){
-    console.log('openinstall.getInstall success: ' + data);
+    console.log('openinstall.getInstall success: ' + JSON.stringify(data));
 }, function(msg){
     console.log('openinstall.getInstall error: ' + msg);
 });
@@ -64,7 +75,7 @@ window.openinstall.getInstall(function(data){
 也可传入一个整形数值，单位秒，指定时间未返回将超时  
 ``` js
 window.openinstall.getInstall(function(data){
-    console.log('openinstall.getInstall success: ' + data);
+    console.log('openinstall.getInstall success: ' + JSON.stringify(data));
 }, function(msg){
     console.log('openinstall.getInstall error: ' + msg);
 }, 10);
@@ -96,9 +107,38 @@ window.openinstall.reportEffectPoint("effect_test", 1);
   
 调用接口后，可在后台查看效果点统计数据
 
-### 三、导出apk/api包并上传
+### 三、导出apk/ipa包并上传
 - 代码集成完毕后，需要导出安装包上传openinstall后台，openinstall会自动完成所有的应用配置工作。  
 - 上传完成后即可开始在线模拟测试，体验完整的App安装/拉起流程；待测试无误后，再完善下载配置信息。
 
 ![上传安装包](res/guide2.jpg)  
+
+----------
+
+## 广告平台补充文档
+
+### Android平台
+
+#### 广告平台配置
+针对广告平台接入，新增配置接口，在调用 init 之前调用。参考 [广告平台对接Android集成指引](https://www.openinstall.io/doc/ad_android.html)
+``` js
+    var options = {
+        adEnabled: true, 
+    }
+    window.openinstall.config(options);
+```
+options 可选参数如下：  
+- adEnabled: true   
+SDK 需要获取广告追踪相关参数
+- macDisabled: true  
+SDK 不需要获取 mac地址
+- imeiDisabled: true  
+SDK 不需要获取 imei
+- gaid: "通过 google api 获取到的 advertisingId"  
+SDK 使用传入的gaid，不再获取gaid
+- oaid: "通过移动安全联盟获取到的 oaid"  
+SDK 使用传入的oaid，不再获取oaid
+#### 权限申请
+针对广告平台，为了精准地匹配到渠道，需要获取设备唯一标识码（IMEI），因此需要做额外的权限申请。  
+请自行进行权限申请，无论用户是否同意授权都要调用初始化
 

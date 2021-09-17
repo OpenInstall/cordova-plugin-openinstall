@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-openinstall" version="1.5.3"
+<plugin id="cordova-plugin-openinstall" version="2.0.0"
+>>>>>>> c15a34f7c3c2bed8058186e9497740da99595716
     xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android">
     
@@ -47,7 +48,7 @@
         </edit-config>
 
         <source-file src="src/android/OpenInstallPlugin.java" target-dir="src/io/openinstall/cordova" />
-        <lib-file src="src/android/lib/OpenInstall_v2.5.3.jar" target-dir="libs" />
+        <lib-file src="src/android/lib/OpenInstall_v2.5.4.jar" target-dir="libs" />
 
     </platform>
     
