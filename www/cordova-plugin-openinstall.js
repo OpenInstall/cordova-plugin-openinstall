@@ -14,7 +14,7 @@ module.exports = {
      *      oaid: "通过移动安全联盟获取到的 oaid"
      * }
      */
-    config: function(options){
+    configAndroid: function(options){
         function pass() {};
         
         exec(pass, pass, "OpenInstallPlugin", "config", [options.adEnabled, 
