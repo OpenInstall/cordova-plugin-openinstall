@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-openinstall" version="2.0.0"
->>>>>>> c15a34f7c3c2bed8058186e9497740da99595716
     xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android">
     
