@@ -1,5 +1,7 @@
 # cordova-plugin-openinstall
-openinstall 的 cordova 插件
+openinstall 的 cordova 插件   
+
+[如何在 capacitor 中使用？](https://github.com/OpenInstall/cordova-plugin-openinstall/issues/1#issuecomment-655984502)
 
 ## 一、安装插件
 
@@ -24,7 +26,7 @@ App 启动时，请确保用户同意《隐私政策》之后，再调用初始�
 ``` js
 window.openinstall.init();
 ```
-### 2 快速安装和一键跳转
+### 2 快速安装和一键拉起
 #### 拉起参数获取
 调用以下代码注册拉起回调，应尽早调用。如在 `deviceready` 事件回调之时注册
 ``` js
@@ -117,7 +119,7 @@ window.openinstall.reportEffectPoint("effect_test", 1);
 
 ## 如有疑问
 
-若您在集成或使用中有任何疑问或者困难，请 [联系我们](https://www.openinstall.io/)。 
+若您在集成或使用中有任何疑问或者困难，请 [咨询openinstall客服](https://www.openinstall.io/)。 
 
 ---
 

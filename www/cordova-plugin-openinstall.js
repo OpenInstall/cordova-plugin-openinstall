@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-openinstall.openinstall", function(require, exports, module) {
 var exec = require('cordova/exec');
 
 module.exports = {
@@ -42,6 +43,16 @@ module.exports = {
     },
 
     /**
+     * 获取安装参数（仅 Android 支持）
+     * @param onSuccess 成功回调：数据格式为 {'channel': 1002, 'data': {'key': 'value'}}
+     * @param onError 错误回调：返回错误信息
+     * @param time 超时时间：整形值，单位秒
+     */
+    getInstallCanRetry: function (onSuccess, onError, time){
+        exec(onSuccess, onError, "OpenInstallPlugin", "getInstallCanRetry", [time]);
+    },
+
+    /**
      * 注册唤醒监听
      * @param onSuccess 成功回调：数据格式为 {'channel': 1002, 'data': {'key': 'value'}}
      * @param onError 错误回调：返回错误信息
@@ -69,3 +80,5 @@ module.exports = {
     }
 
 };
+
+});
