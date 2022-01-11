@@ -7,8 +7,10 @@ import android.util.Log;
 import com.fm.openinstall.Configuration;
 import com.fm.openinstall.OpenInstall;
 import com.fm.openinstall.listener.AppInstallAdapter;
-import com.fm.openinstall.listener.AppWakeUpAdapter;
+import com.fm.openinstall.listener.AppInstallRetryAdapter;
+import com.fm.openinstall.listener.AppWakeUpListener;
 import com.fm.openinstall.model.AppData;
+import com.fm.openinstall.model.Error;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
@@ -25,6 +27,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
     private static final String METHOD_CONFIG = "config";
     private static final String METHOD_INIT = "init";
     private static final String METHOD_INSTALL = "getInstall";
+    private static final String METHOD_INSTALL_RETRY = "getInstallCanRetry";
     private static final String METHOD_WAKEUP = "registerWakeUpHandler";
     private static final String METHOD_REGISTER = "reportRegister";
     private static final String METHOD_EFFECT = "reportEffectPoint";
@@ -48,10 +51,13 @@ public class OpenInstallPlugin extends CordovaPlugin {
             config(args, callbackContext);
             return true;
         } else if (METHOD_INIT.equals(action)) {
-            init();
+            init(callbackContext);
             return true;
         } else if (METHOD_INSTALL.equals(action)) {
             getInstall(args, callbackContext);
+            return true;
+        } else if (METHOD_INSTALL_RETRY.equals(action)) {
+            getInstallCanRetry(args, callbackContext);
             return true;
         } else if (METHOD_WAKEUP.equals(action)) {
             registerWakeUpHandler(callbackContext);
@@ -94,67 +100,50 @@ public class OpenInstallPlugin extends CordovaPlugin {
         }
         builder.gaid(gaid).oaid(oaid);
         configuration = builder.build();
+
+        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+        callbackContext.sendPluginResult(result);
     }
 
-    protected void init() {
-        Log.d(TAG, "init");
+    protected void init(CallbackContext callbackContext) {
         OpenInstall.init(cordova.getActivity(), configuration);
+
+        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+        callbackContext.sendPluginResult(result);
     }
 
     protected void getInstall(CordovaArgs args, final CallbackContext callbackContext) {
-        int timeout = -1;
+        int timeout = 10;
         if (args != null && !args.isNull(0)) {
             timeout = args.optInt(0);
         }
-        Log.d(TAG, "getInstall # " + timeout + "s");
         OpenInstall.getInstall(new AppInstallAdapter() {
             @Override
             public void onInstall(AppData appData) {
-                Log.d(TAG, "onInstallFinish # " + (appData == null ? "AppData is null" : appData.toString()));
-                if (appData != null) {
-                    String channel = appData.getChannel();
-                    String data = appData.getData();
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("channel", channel);
-                        jsonObject.put("data", data);
-                    } catch (JSONException e) {
-//            e.printStackTrace();
-                    }
-                    callbackContext.success(jsonObject);
-                } else {
-                    callbackContext.success();
-                }
+                Log.d(TAG, "getInstall # " + appData.toString());
+                callbackContext.success(parseData(appData));
             }
         }, timeout);
     }
 
-    private void getWakeUp(Intent intent, final CallbackContext callbackContext) {
-        Log.d(TAG, "getWakeUp # intent : " + intent.getDataString());
-        OpenInstall.getWakeUp(intent, new AppWakeUpAdapter() {
+    protected void getInstallCanRetry(CordovaArgs args, final CallbackContext callbackContext) {
+        int timeout = 3;
+        if (args != null && !args.isNull(0)) {
+            timeout = args.optInt(0);
+        }
+        OpenInstall.getInstallCanRetry(new AppInstallRetryAdapter() {
             @Override
-            public void onWakeUp(AppData appData) {
-                Log.d(TAG, "onWakeUpFinish # " + (appData == null ? "AppData is null" : appData.toString()));
-                if (appData != null) {
-                    String channel = appData.getChannel();
-                    String data = appData.getData();
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("channel", channel);
-                        jsonObject.put("data", data);
-                    } catch (JSONException e) {
-//              e.printStackTrace();
-                    }
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject);
-                    result.setKeepCallback(true);
-                    callbackContext.sendPluginResult(result);
-                } else {
-                    PluginResult result = new PluginResult(PluginResult.Status.OK);
-                    result.setKeepCallback(true);
-                    callbackContext.sendPluginResult(result);
+            public void onInstall(AppData appData, boolean retry) {
+                Log.d(TAG, "getInstallCanRetry # " + appData.toString());
+                JSONObject jsonObject = parseData(appData);
+                try {
+                    jsonObject.put("retry", retry);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+                callbackContext.success(jsonObject);
             }
-        });
+        }, timeout);
     }
 
     protected void registerWakeUpHandler(CallbackContext callbackContext) {
@@ -162,18 +151,27 @@ public class OpenInstallPlugin extends CordovaPlugin {
         PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
         result.setKeepCallback(true);
         callbackContext.sendPluginResult(result);
-
+        // 首次调用，程序启动时
         Intent intent = cordova.getActivity().getIntent();
-        if (intent == null || TextUtils.isEmpty(intent.getDataString())) {
-            return;
-        }
-        if (wakeupCallbackContext != null) {
-            getWakeUp(intent, wakeupCallbackContext);
-        }
+        getWakeUp(intent, wakeupCallbackContext);
+    }
+
+    private void getWakeUp(Intent intent, final CallbackContext callbackContext) {
+        OpenInstall.getWakeUpAlwaysCallback(intent, new AppWakeUpListener() {
+            @Override
+            public void onWakeUpFinish(AppData appData, Error error) {
+                if (error != null) {
+                    Log.d(TAG, "getWakeUpAlwaysCallback # " + error.toString());
+                }
+                JSONObject jsonObject = parseData(appData);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, jsonObject);
+                result.setKeepCallback(true);
+                callbackContext.sendPluginResult(result);
+            }
+        });
     }
 
     protected void reportRegister(CordovaArgs args, final CallbackContext callbackContext) {
-        Log.d(TAG, "reportRegister");
         OpenInstall.reportRegister();
     }
 
@@ -184,6 +182,19 @@ public class OpenInstallPlugin extends CordovaPlugin {
             Log.d(TAG, "reportEffectPoint # pointId:" + pointId + ", pointValue:" + pointValue);
             OpenInstall.reportEffectPoint(pointId, pointValue);
         }
+    }
+
+    private JSONObject parseData(AppData appData) {
+        JSONObject jsonObject = new JSONObject();
+        if (appData != null) {
+            try {
+                jsonObject.put("channel", appData.getChannel());
+                jsonObject.put("data", appData.getData());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonObject;
     }
 
 }
