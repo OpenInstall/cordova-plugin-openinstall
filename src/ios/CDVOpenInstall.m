@@ -25,6 +25,20 @@
     if (appKey){
         self.appkey = appKey;
         [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
+    }else{
+        NSString *infoPath = [[NSBundle mainBundle] pathForResource:@"Info" ofType:@"plist"];
+        NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:infoPath];
+        
+        if ([infoDic.allKeys containsObject:@"com.openinstall.APP_KEY"]) {
+            id keyValue = [infoDic objectForKey:@"com.openinstall.APP_KEY"];
+            if ([keyValue isKindOfClass:[NSString class]]) {
+                NSString *value = [NSString stringWithFormat:@"%@",keyValue];
+                if (value.length != 0) {
+                    self.appkey = value;
+                    [OpenInstallSDK setAppKey:self.appkey withDelegate:self];
+                }
+            }
+        }
     }
 }
 -(BOOL)setUniversallinksHandler:(NSUserActivity *)userActivity{

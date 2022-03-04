@@ -1,7 +1,7 @@
 # cordova-plugin-openinstall
 openinstall 的 cordova 插件   
 
-[如何在 capacitor 中使用？](https://github.com/OpenInstall/cordova-plugin-openinstall/issues/1#issuecomment-655984502)
+文档最后提供了在 capacitor 中使用需要做的配置
 
 ## 一、安装插件
 
@@ -40,31 +40,14 @@ window.openinstall.registerWakeUpHandler(function(data){
 ``` json
 {"channel": "渠道号", "data": {"自定义key": "自定义value"}}
 ```
-__注意__：对于 iOS，iOS9.0以后建议使用通用链接（Universal links）实现一键唤醒，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到[苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。(图文步骤请参考[Cordova接入指南](https://www.openinstall.io/doc/cordova_sdk.html))  
-- 在左侧导航器中点击您的项目  
-- 选择'Capabilities'标签  
-- 打开'Associated Domains'开关  
-- 添加openinstall官网后台中应用对应的关联域名（openinstall应用控制台->iOS集成->iOS应用配置->关联域名(Associated Domains)）
 
-**以下配置为可选项**  
+对于 iOS，为确保能正常跳转，AppID 必须开启 Associated Domains 功能，请到 [苹果开发者网站](https://developer.apple.com)，选择 Certificate, Identifiers & Profiles，选择相应的 AppID，开启 Associated Domains。注意：当 AppID 重新编辑过之后，需要更新相应的 mobileprovision 证书。
 
-openinstall可兼容微信openSDK1.8.6以上版本的通用链接跳转功能，注意微信SDK初始化方法中，传入正确格式的universal link链接：  
-``` objc
-//your_wxAppID从微信后台获取，yourAppkey从openinstall后台获取
-[WXApi registerApp:@"your_wxAppID" universalLink:@"https://yourAppkey.openinstall.io/ulink/"];
-```
-- 使用 微信相关cordova插件 时，如果要传`universallink`参数的话，请和上面代码中的保持一致
+![associatedDev](https://res.cdn.openinstall.io/doc/assciationDev.png)
 
-- 微信开放平台后台Universal links配置，要和上面代码中的保持一致  
+在 Xcode 中配置 openinstall 为当前应用生成的关联域名（Associated Domains）：
 
-![微信后台配置](https://res.cdn.openinstall.io/doc/cordova-wx-ulink.jpg)  
-
-- 如果使用了类似 `cordova-plugin-wechat` 插件，为了互相兼容，请注意Xcode工程->TARGETS->Build Phases->Compile Sources，  
-检查`AppDelegate+Wechat.m`和`AppDelegate+OpenInstallSDK.m`是否按从上往下顺序排放：
-
-![插件兼容](https://res.cdn.openinstall.io/doc/cordova-wx-sort.png)  
-
-- 微信SDK更新参考[微信开放平台更新文档](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/iOS.html)  
+![添加associatedDomains](https://res.cdn.openinstall.io/doc/ios-associated-domains.png)
 
 
 ### 3 携带参数安装 （高级版功能）
@@ -149,3 +132,69 @@ options 可选参数如下：
 ```
 3、请自行进行权限申请，在权限申请成功后，再进行openinstall初始化。**无论终端用户是否同意，都要调用初始化**
 
+
+## 如何在 capacitor 中使用？
+#### 1.安装插件
+``` js
+npm install cordova-plugin-openinstall
+```
+#### 2.同步到原生平台
+``` js
+npx cap sync
+```
+
+#### 3.手动修改：
+
+**Android平台**  
+
+1）修改 capacitor-cordova-android-plugins module 下的 AndroidManifest.xml 文件，将
+``` xml
+<meta-data
+   android:name="com.openinstall.APP_KEY"
+   android:value="$OPENINSTALL_APPKEY"/>
+```
+中的 `$OPENINSTALL_APPKEY` 修改为 openinstall 为应用分配的 appkey  
+
+2）修改 app module 下的 `AndroidManifest.xml` 文件，将
+``` xml
+<intent-filter>
+   <action android:name="android.intent.action.VIEW" />
+   <category android:name="android.intent.category.DEFAULT" />
+   <category android:name="android.intent.category.BROWSABLE" />
+   <data android:scheme="@string/custom_url_scheme" />
+</intent-filter>
+```
+的 `@string/custom_url_scheme` 修改为 openinstall 为应用分配的 scheme 或者新增配置
+``` xml
+<intent-filter>
+   <action android:name="android.intent.action.VIEW" />
+   <category android:name="android.intent.category.DEFAULT" />
+   <category android:name="android.intent.category.BROWSABLE" />
+   <data android:scheme="openinstall为应用分配的appkey" />
+</intent-filter>
+```
+
+**iOS平台**
+
+1）找到 `Info.plist` 文件，添加appkey
+``` xml
+    <key>com.openinstall.APP_KEY</key>
+    <string>“从openinstall官网后台获取应用的appkey”</string>
+```
+
+2）找到 `Info.plist` 文件，添加scheme
+``` xml
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>openinstall</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>"从openinstall官网后台获取应用的scheme"</string>
+        </array>
+        </dict>
+    </array>
+```
