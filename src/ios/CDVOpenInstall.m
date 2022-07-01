@@ -40,11 +40,19 @@
             }
         }
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handlerUniverallinks:) name:@"CapacitorOpenUniversalLinkNotification" object:nil];
 }
--(BOOL)setUniversallinksHandler:(NSUserActivity *)userActivity{
-    if ([OpenInstallSDK continueUserActivity:userActivity]) {
-        return YES;
+
+-(void)handlerUniverallinks:(NSNotification *)notification{
+    if (notification.object) {
+        NSUserActivity *activity = [[NSUserActivity alloc]initWithActivityType:NSUserActivityTypeBrowsingWeb];
+        activity.webpageURL = notification.object[@"url"];
+        [OpenInstallSDK continueUserActivity:activity];
     }
+}
+
+-(BOOL)setUniversallinksHandler:(NSUserActivity *)userActivity{
+    [OpenInstallSDK continueUserActivity:userActivity];
     return NO;
 }
 

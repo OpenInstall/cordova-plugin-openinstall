@@ -174,7 +174,9 @@ npx cap sync
 </intent-filter>
 ```
 
-**iOS平台**
+**iOS平台**  
+
+不要同时使用Cordova模式和Pod模式安装插件或SDK，会报错，最好使用Cordova模式安装插件，Pod模式安装的是原生SDK。
 
 1）找到 `Info.plist` 文件，添加appkey
 ``` xml
