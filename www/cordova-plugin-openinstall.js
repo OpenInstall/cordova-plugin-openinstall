@@ -21,6 +21,21 @@ module.exports = {
         exec(pass, pass, "OpenInstallPlugin", "config", [options.adEnabled, 
             options.macDisabled, options.imeiDisabled, options.gaid, options.oaid]);
     },
+	
+	/**
+	 * serialEnabled，serialEnabled
+	 * Android平台初始化前配置
+	 * @param enabled 布尔值，是否允许读取
+	 */
+	serialEnabled: function(enabled){
+        function pass() {};
+        exec(pass, pass, "OpenInstallPlugin", "serialEnabled", [enabled]);
+    },
+	
+	clipBoardEnabled: function(enabled){
+        function pass() {};
+        exec(pass, pass, "OpenInstallPlugin", "clipBoardEnabled", [enabled]);
+    },
 
     /**
      * 新添加api（android 初始化调用）

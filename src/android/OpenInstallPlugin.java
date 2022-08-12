@@ -25,6 +25,8 @@ public class OpenInstallPlugin extends CordovaPlugin {
     private static final String TAG = "OpenInstallPlugin";
 
     private static final String METHOD_CONFIG = "config";
+	private static final String METHOD_SERIAL = "serialEnabled";
+	private static final String METHOD_CLIPBOARD = "clipBoardEnabled";
     private static final String METHOD_INIT = "init";
     private static final String METHOD_INSTALL = "getInstall";
     private static final String METHOD_INSTALL_RETRY = "getInstallCanRetry";
@@ -50,7 +52,13 @@ public class OpenInstallPlugin extends CordovaPlugin {
         if (METHOD_CONFIG.equals(action)) {
             config(args, callbackContext);
             return true;
-        } else if (METHOD_INIT.equals(action)) {
+        } else if (METHOD_SERIAL.equals(action)){
+			serialEnabled(args, callbackContext);
+			return true;
+		} else if (METHOD_CLIPBOARD.equals(action)){
+			clipBoardEnabled(args, callbackContext);
+			return true;
+		} else if (METHOD_INIT.equals(action)) {
             init(callbackContext);
             return true;
         } else if (METHOD_INSTALL.equals(action)) {
@@ -104,6 +112,16 @@ public class OpenInstallPlugin extends CordovaPlugin {
         PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
         callbackContext.sendPluginResult(result);
     }
+
+	protected void serialEnabled(CordovaArgs args, CallbackContext callbackContext) {
+		boolean enabled = args.optBoolean(0);
+		OpenInstall.serialEnabled(enabled);
+	}
+	
+	protected void clipBoardEnabled(CordovaArgs args, CallbackContext callbackContext) {
+		boolean enabled = args.optBoolean(0);
+		OpenInstall.clipBoardEnabled(enabled);
+	}
 
     protected void init(CallbackContext callbackContext) {
         OpenInstall.init(cordova.getActivity(), configuration);
