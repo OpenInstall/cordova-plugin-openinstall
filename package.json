@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-openinstall",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "cordova": {
     "id": "cordova-plugin-openinstall",
     "platforms": [
@@ -12,7 +12,7 @@
     "一键拉起",
     "免填邀请码",
     "广告效果监测",
-	"渠道统计"
+    "渠道统计"
   ],
   "repository" : { 
     "type" : "git",

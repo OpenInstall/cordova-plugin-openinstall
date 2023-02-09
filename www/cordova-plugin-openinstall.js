@@ -5,25 +5,24 @@ module.exports = {
     
 
     /**
-     * 新添加api（android初始化前配置）
+     * android初始化前配置
      * @param options 配置参数：
      * {
      *      adEnabled: true, 
      *      macDisabled: true,
      *      imeiDisabled: true,
      *      gaid: "通过 google api 获取到的 advertisingId",
-     *      oaid: "通过移动安全联盟获取到的 oaid"
+     *      oaid: "通过移动安全联盟获取到的 oaid",
+     *      ...
      * }
      */
     configAndroid: function(options){
         function pass() {};
         
-        exec(pass, pass, "OpenInstallPlugin", "config", [options.adEnabled, 
-            options.macDisabled, options.imeiDisabled, options.gaid, options.oaid]);
+        exec(pass, pass, "OpenInstallPlugin", "config", [options]);
     },
 	
 	/**
-	 * serialEnabled，serialEnabled
 	 * Android平台初始化前配置
 	 * @param enabled 布尔值，是否允许读取
 	 */
@@ -38,12 +37,10 @@ module.exports = {
     },
 
     /**
-     * 新添加api（android 初始化调用）
      * 初始化
      */
     init: function(){
         function pass() {};
-        
         exec(pass, pass, "OpenInstallPlugin", "init", []);
     },
 
@@ -88,10 +85,11 @@ module.exports = {
      * 上报效果点
      * @param pointId 效果点ID
      * @param pointValue 效果点值 (数字类型)
+     * @param extras 效果点自定义参数 <string,string>
      */
-    reportEffectPoint: function(pointId, pointValue){
+    reportEffectPoint: function(pointId, pointValue, extras){
         function pass() {};
-        exec(pass, pass, "OpenInstallPlugin", "reportEffectPoint", [pointId, pointValue]);
+        exec(pass, pass, "OpenInstallPlugin", "reportEffectPoint", [pointId, pointValue, extras||{}]);
     }
 
 };

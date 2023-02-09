@@ -19,14 +19,16 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 
 public class OpenInstallPlugin extends CordovaPlugin {
 
     private static final String TAG = "OpenInstallPlugin";
 
     private static final String METHOD_CONFIG = "config";
-	private static final String METHOD_SERIAL = "serialEnabled";
-	private static final String METHOD_CLIPBOARD = "clipBoardEnabled";
     private static final String METHOD_INIT = "init";
     private static final String METHOD_INSTALL = "getInstall";
     private static final String METHOD_INSTALL_RETRY = "getInstallCanRetry";
@@ -52,13 +54,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
         if (METHOD_CONFIG.equals(action)) {
             config(args, callbackContext);
             return true;
-        } else if (METHOD_SERIAL.equals(action)){
-			serialEnabled(args, callbackContext);
-			return true;
-		} else if (METHOD_CLIPBOARD.equals(action)){
-			clipBoardEnabled(args, callbackContext);
-			return true;
-		} else if (METHOD_INIT.equals(action)) {
+        } else if (METHOD_INIT.equals(action)) {
             init(callbackContext);
             return true;
         } else if (METHOD_INSTALL.equals(action)) {
@@ -89,41 +85,65 @@ public class OpenInstallPlugin extends CordovaPlugin {
     }
 
     protected void config(CordovaArgs args, final CallbackContext callbackContext) {
-
-        boolean adEnabled = args.optBoolean(0);
-        boolean macDisabled = args.optBoolean(1);
-        boolean imeiDisabled = args.optBoolean(2);
-        String gaid = args.optString(3);
-        String oaid = args.optString(4);
-
-        Log.d(TAG, "config # " + "adEnabled = " + adEnabled + ", macDisabled = " + macDisabled
-                + ", imeiDisabled = " + imeiDisabled + ", gaid = " + gaid + ", oaid = " + oaid);
-        Configuration.Builder builder = new Configuration.Builder();
-        builder.adEnabled(adEnabled);
-        if (macDisabled) {
-            builder.macDisabled();
+        JSONObject jsonObject;
+        if (args != null && !args.isNull(0)) {
+            jsonObject = args.optJSONObject(0);
+        } else {
+            jsonObject = new JSONObject();
         }
-        if (imeiDisabled) {
+        Configuration.Builder builder = new Configuration.Builder();
+        boolean adEnabled = jsonObject.optBoolean("adEnabled", false);
+        builder.adEnabled(adEnabled);
+        if (jsonObject.has("oaid")) {
+            builder.oaid(jsonObject.optString("oaid"));
+        }
+        if (jsonObject.has("gaid")) {
+            builder.gaid(jsonObject.optString("gaid"));
+        }
+        if (jsonObject.optBoolean("imeiDisabled", false)) {
             builder.imeiDisabled();
         }
-        builder.gaid(gaid).oaid(oaid);
+        if (jsonObject.has("imei")) {
+            builder.imei(jsonObject.optString("imei"));
+        }
+        if (jsonObject.optBoolean("macDisabled", false)) {
+            builder.macDisabled();
+        }
+        if (jsonObject.has("macAddress")) {
+            builder.macAddress(jsonObject.optString("macAddress"));
+        }
+
+        if (jsonObject.has("androidId")) {
+            builder.androidId(jsonObject.optString("androidId"));
+        }
+        if (jsonObject.has("serialNumber")) {
+            builder.serialNumber(jsonObject.optString("serialNumber"));
+        }
+        if (jsonObject.optBoolean("simulatorDisabled", false)) {
+            builder.simulatorDisabled();
+        }
+        if (jsonObject.optBoolean("storageDisabled", false)) {
+            builder.storageDisabled();
+        }
+
         configuration = builder.build();
 
         PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
         callbackContext.sendPluginResult(result);
     }
 
-	protected void serialEnabled(CordovaArgs args, CallbackContext callbackContext) {
-		boolean enabled = args.optBoolean(0);
-		OpenInstall.serialEnabled(enabled);
-	}
-	
-	protected void clipBoardEnabled(CordovaArgs args, CallbackContext callbackContext) {
-		boolean enabled = args.optBoolean(0);
-		OpenInstall.clipBoardEnabled(enabled);
-	}
-
     protected void init(CallbackContext callbackContext) {
+
+//        Field[] fields = Configuration.class.getDeclaredFields();
+//        for (Field f : fields) {
+//            try {
+//                f.setAccessible(true);
+//                Log.d(TAG, "值 - " + f.get(configuration));
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
         OpenInstall.init(cordova.getActivity(), configuration);
 
         PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -198,7 +218,16 @@ public class OpenInstallPlugin extends CordovaPlugin {
             String pointId = args.optString(0);
             long pointValue = args.optLong(1);
             Log.d(TAG, "reportEffectPoint # pointId:" + pointId + ", pointValue:" + pointValue);
-            OpenInstall.reportEffectPoint(pointId, pointValue);
+            Map<String, String> extraMap = new HashMap<String, String>();
+            if (!args.isNull(2)) {
+                JSONObject jsonObject = args.optJSONObject(2);
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    extraMap.put(key, jsonObject.optString(key));
+                }
+            }
+            OpenInstall.reportEffectPoint(pointId, pointValue, extraMap);
         }
     }
 

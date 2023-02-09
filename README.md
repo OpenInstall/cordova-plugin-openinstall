@@ -90,7 +90,15 @@ window.openinstall.reportRegister();
 ``` js
 window.openinstall.reportEffectPoint("effect_test", 1);
 ```
-
+#### 4.3 效果点明细统计
+效果点建立在渠道基础之上，主要用来统计终端用户对某些特殊业务的使用效果。调用此接口时，请使用后台创建的 “效果点ID” 作为 pointId   
+``` js
+var extras = {
+    "key1": "value1",
+    "key2": "value2"
+}
+window.openinstall.reportEffectPoint("effect_detail", 1, extras);
+```
 
 ## 三、导出apk/ipa包并上传
 
