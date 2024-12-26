@@ -9,6 +9,7 @@ import com.fm.openinstall.OpenInstall;
 import com.fm.openinstall.listener.AppInstallAdapter;
 import com.fm.openinstall.listener.AppInstallRetryAdapter;
 import com.fm.openinstall.listener.AppWakeUpListener;
+import com.fm.openinstall.listener.ResultCallback;
 import com.fm.openinstall.model.AppData;
 import com.fm.openinstall.model.Error;
 
@@ -35,6 +36,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
     private static final String METHOD_WAKEUP = "registerWakeUpHandler";
     private static final String METHOD_REGISTER = "reportRegister";
     private static final String METHOD_EFFECT = "reportEffectPoint";
+    private static final String METHOD_SHARE = "reportShare";
 
     private Configuration configuration = null;
     private CallbackContext wakeupCallbackContext = null;
@@ -42,7 +44,7 @@ public class OpenInstallPlugin extends CordovaPlugin {
     @Override
     protected void pluginInitialize() {
         super.pluginInitialize();
-        // init();
+        OpenInstall.preInit(cordova.getActivity());
     }
 
     @Override
@@ -71,6 +73,9 @@ public class OpenInstallPlugin extends CordovaPlugin {
             return true;
         } else if (METHOD_EFFECT.equals(action)) {
             reportEffectPoint(args, callbackContext);
+            return true;
+        } else if (METHOD_SHARE.equals(action)) {
+            reportShare(args, callbackContext);
             return true;
         }
         return false;
@@ -228,6 +233,26 @@ public class OpenInstallPlugin extends CordovaPlugin {
                 }
             }
             OpenInstall.reportEffectPoint(pointId, pointValue, extraMap);
+        }
+    }
+
+    protected void reportShare(CordovaArgs args, final CallbackContext callbackContext) {
+        if (args != null && !args.isNull(0) && !args.isNull(1)) {
+            String shareCode = args.optString(0);
+            String sharePlatform = args.optString(1);
+            Log.d(TAG, "reportShare # shareCode:" + shareCode + ", sharePlatform:" + sharePlatform);
+            OpenInstall.reportShare(shareCode, sharePlatform, new ResultCallback<Void>(){
+                @Override
+                public void onResult(Void ignore, Error error) {
+                    if(error != null){
+                        callbackContext.error(error.toString());
+                    }else{
+                        callbackContext.success(1);
+                    }
+                }
+            });
+        }else{
+            callbackContext.error("参数错误");
         }
     }
 

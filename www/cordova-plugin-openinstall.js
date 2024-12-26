@@ -89,6 +89,16 @@ module.exports = {
     reportEffectPoint: function(pointId, pointValue, extras){
         function pass() {};
         exec(pass, pass, "OpenInstallPlugin", "reportEffectPoint", [pointId, pointValue, extras||{}]);
+    },
+
+    /**
+     * 分享统计
+     * @param shareCode 分享渠道编号
+     * @param sharePlatform 分享平台
+     */
+    reportShare: function(onSuccess, onError, shareCode, sharePlatform){
+        
+        exec(onSuccess, onError, "OpenInstallPlugin", "reportShare", [shareCode, sharePlatform]);
     }
 
 };
