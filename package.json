@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-openinstall",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "cordova": {
     "id": "cordova-plugin-openinstall",
     "platforms": [
@@ -14,9 +14,9 @@
     "广告效果监测",
     "渠道统计"
   ],
-  "repository" : { 
-    "type" : "git",
-    "url" : "https://github.com/OpenInstall/cordova-plugin-openinstall.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenInstall/cordova-plugin-openinstall.git"
   },
   "author": "openinstall",
   "license": "MIT",
